@@ -493,6 +493,101 @@ START_TEST(test_vec3_inv)
 }
 END_TEST
 
+START_TEST(test_vec3_distance)
+{
+	vec3_t a = {5.0f, 0.0f, 5.0f};
+	vec3_t b = {0.0f, 5.0f, 0.0f};
+	float d = vec3_distance(a, b);
+	fail_unless(FLOATS_ARE_EQUAL(d, 8.66025403f),
+		    "%f distance expected, got: %f", 8.66025403f, d);
+}
+END_TEST
+
+START_TEST(test_vec3_distance2)
+{
+	vec3_t a = {4.5f, 7.8f, -3.3f};
+	vec3_t b = {1.2f, -7.5f, 4.8f};
+	float d2 = vec3_distance2(a, b);
+	fail_unless(FLOATS_ARE_EQUAL(d2, 310.590027f),
+		    "%f distance2 expected, got: %f", 310.590027f, d2);
+}
+END_TEST
+
+START_TEST(test_vec3_dot)
+{
+	vec3_t a = {1.3f, -1.5f, -7.0f};
+	vec3_t b = {5.4f, 3.0f, 0.0f};
+	float dot = vec3_dot(a, b);
+	fail_unless(FLOATS_ARE_EQUAL(dot, 2.52f),
+		    "f%f dot product expected, got: %f", 2.52f, dot);
+}
+END_TEST
+
+START_TEST(test_vec3_cross)
+{
+	vec3_t a = {5.0f, 0.0f, 0.0f};
+	vec3_t b = {0.0f, 5.0f, 5.0f};
+	vec3_t c;
+	vec3_cross(c, a, b);
+	CHECK_VEC3(c, 0.0f, -25.0f, 25.0f);
+}
+END_TEST
+
+START_TEST(test_vec3_advance)
+{
+	vec3_t b, a = {4.5f, 0.0f, 7.1f};
+	vec3_advance(b, a, VEC3_UNIT_Y, 3.0f);
+	CHECK_VEC3(b, 4.5f, 3.0f, 7.1f);
+
+	vec3_advance(b, a, VEC3_UNIT_X, -2.0f);
+	CHECK_VEC3(b, 2.5f, 0.0f, 7.1f);
+
+	vec3_advance(a, b, (vec3_t){0.0f, 1.0f, 1.0f}, 2.0f);
+	CHECK_VEC3(a, 2.5f, 2.0f, 9.1f);
+}
+END_TEST
+
+START_TEST(test_vec3_equals)
+{
+	vec3_t b, a = {1.4f, -3.1415f, 5.16f};
+	vec3_copy(b, a);
+	fail_unless(vec3_equals(a, b),
+		    "vectors equality expected, got: (%f,%f,%f) != (%f,%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_Z(a),
+		    VEC_X(b), VEC_Y(b), VEC_Z(b));
+
+	vec3_set(b, 1.0f, 1.0f, 5.16f);
+	fail_unless(!vec3_equals(a, b),
+		    "vectors unequality expected, got: (%f,%f,%f) != (%f,%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_Z(a),
+		    VEC_X(b), VEC_Y(b), VEC_Z(b));
+}
+END_TEST
+
+START_TEST(test_vec3_rotate)
+{
+	vec3_t a;
+	vec3_copy(a, VEC3_UNIT_Y);
+	vec3_rotate_x(a, 45.0f, VEC3_ZERO);
+	CHECK_VEC3(a, 0.0f, 0.7071067f, 0.7071067f);
+
+	vec3_rotate_z(a, -45.0f, VEC3_ZERO);
+	CHECK_VEC3(a, 0.5f, 0.5f, 0.7071067f);
+
+	vec3_copy(a, VEC3_UNIT_Z);
+	vec3_rotate_x(a, 45.0f, VEC3_ZERO);
+	CHECK_VEC3(a, 0.0f, -0.7071067f, 0.7071067f);
+
+	vec3_set(a, 0.0f, 2.0f, 0.0f);
+	vec3_rotate_x(a, 45.0f, (vec3_t){0.0f, 1.0f, 0.0f});
+	CHECK_VEC3(a, 0.0f, 1.7071067f, 0.7071067f);
+
+	// TODO: something is wrong here, check rotation CW CCW correctness
+	vec3_rotate_y(a, 45.0f, (vec3_t){0.0f, 1.0f, 0.0f});
+	CHECK_VEC3(a, -0.5f, 1.7071067f, 0.5f);
+}
+END_TEST
+
 Suite *linear_math_suite()
 {
 	Suite *s = suite_create("linear_math");
@@ -560,15 +655,13 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_vec3, test_vec3_length);
 	tcase_add_test(tc_vec3, test_vec3_normalize);
 	tcase_add_test(tc_vec3, test_vec3_inv);
-	//tcase_add_test(tc_vec3, test_vec3_distance);
-	//tcase_add_test(tc_vec3, test_vec3_distance2);
-	//tcase_add_test(tc_vec3, test_vec3_dot);
-	//tcase_add_test(tc_vec3, test_vec3_cross);
-	//tcase_add_test(tc_vec3, test_vec3_advance);
-	//tcase_add_test(tc_vec3, test_vec3_equals);
-	//tcase_add_test(tc_vec3, test_vec3_rotate_x);
-	//tcase_add_test(tc_vec3, test_vec3_rotate_y);
-	//tcase_add_test(tc_vec3, test_vec3_rotate_z);
+	tcase_add_test(tc_vec3, test_vec3_distance);
+	tcase_add_test(tc_vec3, test_vec3_distance2);
+	tcase_add_test(tc_vec3, test_vec3_dot);
+	tcase_add_test(tc_vec3, test_vec3_cross);
+	tcase_add_test(tc_vec3, test_vec3_advance);
+	tcase_add_test(tc_vec3, test_vec3_equals);
+	tcase_add_test(tc_vec3, test_vec3_rotate);
 
 	suite_add_tcase(s, tc_vec2);
 	suite_add_tcase(s, tc_vec3);
