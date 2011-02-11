@@ -353,6 +353,8 @@ static inline float vec2_dot(const vec2_t v1, const vec2_t v2)
 	return (VEC_X(v1)*VEC_X(v2) + VEC_Y(v1)*VEC_Y(v2));
 }
 
+// for left-handed coordinate system, rotation is CW when imaginary Z goes
+// towards you
 void vec2_rotate(vec2_t out, float deg, const vec2_t origin);
 
 /**************************************************************************
@@ -617,6 +619,8 @@ static inline bool vec3_equals(const vec3_t v1, const vec3_t v2)
 	return (VEC_X(v1) == VEC_X(v2) && VEC_Y(v1) == VEC_Y(v2) && VEC_Z(v1) == VEC_Z(v2));
 }
 
+// for left-handed coordinate system, rotation is CW, when specified axis goes
+// towards you
 void vec3_rotate_x(vec3_t out, float deg, const vec3_t origin);
 void vec3_rotate_y(vec3_t out, float deg, const vec3_t origin);
 void vec3_rotate_z(vec3_t out, float deg, const vec3_t origin);
