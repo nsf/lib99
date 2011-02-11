@@ -587,6 +587,73 @@ START_TEST(test_vec3_rotate)
 }
 END_TEST
 
+/**************************************************************************
+  vec4: four-dimensional vector
+**************************************************************************/
+
+#define CHECK_VEC4(v, x, y, z, w)					\
+do {									\
+	fail_unless(FLOATS_ARE_EQUAL(VEC_X(v), x),			\
+		    "%f X value expected, got: %f", (x), VEC_X(v));	\
+	fail_unless(FLOATS_ARE_EQUAL(VEC_Y(v), y),			\
+		    "%f Y value expected, got: %f", (y), VEC_Y(v));	\
+	fail_unless(FLOATS_ARE_EQUAL(VEC_Z(v), z),			\
+		    "%f Z value expected, got: %f", (z), VEC_Z(v));	\
+	fail_unless(FLOATS_ARE_EQUAL(VEC_W(v), w),			\
+		    "%f W value expected, got: %f", (w), VEC_W(v));	\
+} while (0)
+
+
+START_TEST(test_vec4_set)
+{
+	vec4_t a;
+	vec4_set(a, 5.0f, 4.4f, 3.3f, 1.7f);
+	CHECK_VEC4(a, 5.0f, 4.4f, 3.3f, 1.7f);
+}
+END_TEST
+
+START_TEST(test_vec4_neg)
+{
+	vec4_t b, a = {1.7f, -5.6f, 45.3f, -9.9f};
+	vec4_neg(b, a);
+	CHECK_VEC4(b, -1.7f, 5.6f, -45.3f, 9.9f);
+}
+END_TEST
+
+START_TEST(test_vec4_copy)
+{
+	vec4_t b, a = {6.6f, 7.1f, -2.3f, -9.0f};
+	vec4_copy(b, a);
+	CHECK_VEC4(b, 6.6f, 7.1f, -2.3f, -9.0f);
+}
+END_TEST
+
+START_TEST(test_vec4_equals)
+{
+	vec4_t b, a = {4.3f, 8.2f, 9.5f, -3.3f};
+	vec4_copy(b, a);
+	fail_unless(vec4_equals(a, b),
+		    "vectors equality expected, got: (%f,%f,%f,%f) != (%f,%f,%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_Z(a), VEC_W(a),
+		    VEC_X(b), VEC_Y(b), VEC_Z(b), VEC_W(b));
+
+	VEC_W(b) = 10.0f;
+	fail_unless(!vec4_equals(a, b),
+		    "vectors unequality expected, got: (%f,%f,%f,%f) != (%f,%f,%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_Z(a), VEC_W(a),
+		    VEC_X(b), VEC_Y(b), VEC_Z(b), VEC_W(b));
+}
+END_TEST
+
+/**************************************************************************
+  mat4: 4x4 OpenGL (column-major) matrix
+**************************************************************************/
+
+START_TEST(test_mat4_copy)
+{
+}
+END_TEST
+
 Suite *linear_math_suite()
 {
 	Suite *s = suite_create("linear_math");
@@ -662,7 +729,18 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_vec3, test_vec3_equals);
 	tcase_add_test(tc_vec3, test_vec3_rotate);
 
+	TCase *tc_vec4 = tcase_create("vec4");
+	tcase_add_test(tc_vec4, test_vec4_set);
+	tcase_add_test(tc_vec4, test_vec4_neg);
+	tcase_add_test(tc_vec4, test_vec4_copy);
+	tcase_add_test(tc_vec4, test_vec4_equals);
+
+	TCase *tc_mat4 = tcase_create("mat4");
+	tcase_add_test(tc_mat4, test_mat4_copy);
+
 	suite_add_tcase(s, tc_vec2);
 	suite_add_tcase(s, tc_vec3);
+	suite_add_tcase(s, tc_vec4);
+	suite_add_tcase(s, tc_mat4);
 	return s;
 }
