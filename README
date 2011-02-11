@@ -1,0 +1,15 @@
+lib99 is a simple collection of mini-libraries for C99.
+
+Targeted operating system is linux (but anything POSIX and C99 compliant
+should work).
+
+The rules for this collection are simple:
+ - Each library consists of three files:
+     lib.c:       source code
+     lib.h:       header file
+     lib_test.c:  unit tests
+ - There are no interdependencies between libraries.
+ - Minimum amount of external dependencies (zero or stdlib only is the best).
+ - Permissive license (BSD-like, MIT-like, public domain, etc.)
+ - Awesome code.
+
