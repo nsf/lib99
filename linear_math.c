@@ -9,6 +9,7 @@
 
 void vec2_rotate(vec2_t out, float deg, const vec2_t origin)
 {
+	// for L-handed, CW, when imaginary Z goes towards you
 	deg *= MATH_DEG_TO_RAD;
 	float cosdeg = cosf(deg);
 	float sindeg = sinf(deg);
@@ -26,6 +27,7 @@ void vec2_rotate(vec2_t out, float deg, const vec2_t origin)
 
 void vec3_rotate_x(vec3_t out, float deg, const vec3_t origin)
 {
+	// for L-handed, CW, when X goes towards you
 	deg *= MATH_DEG_TO_RAD;
 	float cosdeg = cosf(deg);
 	float sindeg = sinf(deg);
@@ -42,6 +44,7 @@ void vec3_rotate_x(vec3_t out, float deg, const vec3_t origin)
 
 void vec3_rotate_y(vec3_t out, float deg, const vec3_t origin)
 {
+	// for L-handed, CW, when Y goes towards you
 	deg *= MATH_DEG_TO_RAD;
 	float cosdeg = cosf(deg);
 	float sindeg = sinf(deg);
@@ -49,15 +52,16 @@ void vec3_rotate_y(vec3_t out, float deg, const vec3_t origin)
 	VEC_X(out) -= VEC_X(origin);
 	VEC_Z(out) -= VEC_Z(origin);
 	vec3_set(out,
-		 VEC_X(out) * cosdeg - VEC_Z(out) * sindeg,
+		 VEC_Z(out) * sindeg + VEC_X(out) * cosdeg,
 		 VEC_Y(out),
-		 VEC_X(out) * sindeg + VEC_Z(out) * cosdeg);
+		 VEC_Z(out) * cosdeg - VEC_X(out) * sindeg);
 	VEC_X(out) += VEC_X(origin);
 	VEC_Z(out) += VEC_Z(origin);
 }
 
 void vec3_rotate_z(vec3_t out, float deg, const vec3_t origin)
 {
+	// for L-handed, CW, when Z goes towards you
 	vec2_rotate(out, deg, origin);
 }
 

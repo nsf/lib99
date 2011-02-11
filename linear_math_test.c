@@ -582,9 +582,8 @@ START_TEST(test_vec3_rotate)
 	vec3_rotate_x(a, 45.0f, (vec3_t){0.0f, 1.0f, 0.0f});
 	CHECK_VEC3(a, 0.0f, 1.7071067f, 0.7071067f);
 
-	// TODO: something is wrong here, check rotation CW CCW correctness
 	vec3_rotate_y(a, 45.0f, (vec3_t){0.0f, 1.0f, 0.0f});
-	CHECK_VEC3(a, -0.5f, 1.7071067f, 0.5f);
+	CHECK_VEC3(a, 0.5f, 1.7071067f, 0.5f);
 }
 END_TEST
 
