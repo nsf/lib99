@@ -56,6 +56,22 @@ enum frustum_plane {
 	FRUSTUM_PLANE_TOP
 };
 
+/*
+ * If I'm writing down a column-major matrix as a C array, it looks transposed
+ * on a paper (in a text file). This macro changes situation.
+ *
+ * E.g. always use this for constants:
+ * mat4_t m = MAT4(...);
+ *
+ * instead of:
+ * mat4_t m = {...};
+ */
+#define MAT4(m0,m1,m2,m3,m4,m5,m6,m7,m8,m9,m10,m11,m12,m13,m14,m15)	\
+	{m0, m4, m8,  m12,						\
+	 m1, m5, m9,  m13,						\
+	 m2, m6, m10, m14,						\
+	 m3, m7, m11, m15}
+
 /* Accessors. */
 #define RECT_X(r) ((r)[0])
 #define RECT_Y(r) ((r)[1])
@@ -67,7 +83,12 @@ enum frustum_plane {
 #define VEC_Z(v) ((v)[2])
 #define VEC_W(v) ((v)[3])
 
+// TODO: wrong?
 #define MAT4_RC(m, row, column) ((m)[(row)*4+(column)])
+
+#define MAT4_AXIS_X(m) (vec3_t){m[0], m[4], m[8]}
+#define MAT4_AXIS_Y(m) (vec3_t){m[1], m[5], m[9]}
+#define MAT4_AXIS_Z(m) (vec3_t){m[2], m[6], m[10]}
 
 #define PLANE_NX(p) ((p)[0])
 #define PLANE_NY(p) ((p)[1])
@@ -662,10 +683,10 @@ static inline bool vec4_equals(const vec4_t v1, const vec4_t v2)
   mat4: 4x4 OpenGL (column-major) matrix
 **************************************************************************/
 
+bool mat4_equals(const mat4_t m1, const mat4_t m2);
 void mat4_copy(mat4_t out, const mat4_t m);
 void mat4_transform_vec3(vec3_t v, const mat4_t m);
 void mat4_mul(mat4_t out, const mat4_t m1, const mat4_t m2);
-bool mat4_equals(const mat4_t m1, const mat4_t m2);
 bool mat4_is_identity(const mat4_t m);
 float mat4_determinant(const mat4_t m);
 void mat4_inverse(mat4_t out, const mat4_t m);

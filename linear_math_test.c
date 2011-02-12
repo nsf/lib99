@@ -649,8 +649,293 @@ END_TEST
   mat4: 4x4 OpenGL (column-major) matrix
 **************************************************************************/
 
+#define CHECK_MAT4(v,							\
+		   m0, m4, m8, m12,					\
+		   m1, m5, m9, m13,					\
+		   m2, m6, m10, m14,					\
+		   m3, m7, m11, m15)					\
+do {									\
+	mat4_t m = {m0,m1,m2,m3,m4,m5,m6,m7,m8,				\
+		    m9,m10,m11,m12,m13,m14,m15};			\
+	if (!mat4_equals(v, m)) {					\
+		fail("expected:\n"					\
+		     "[%.6f %.6f %.6f %.6f\n"				\
+		     " %.6f %.6f %.6f %.6f\n"				\
+		     " %.6f %.6f %.6f %.6f\n"				\
+		     " %.6f %.6f %.6f %.6f]\n"				\
+		     "got:\n"						\
+		     "[%.6f %.6f %.6f %.6f\n"				\
+		     " %.6f %.6f %.6f %.6f\n"				\
+		     " %.6f %.6f %.6f %.6f\n"				\
+		     " %.6f %.6f %.6f %.6f]\n",				\
+		     m[0],m[4],m[8], m[12],				\
+		     m[1],m[5],m[9], m[13],				\
+		     m[2],m[6],m[10],m[14],				\
+		     m[3],m[7],m[11],m[15],				\
+		     v[0],v[4],v[8], v[12],				\
+		     v[1],v[5],v[9], v[13],				\
+		     v[2],v[6],v[10],v[14],				\
+		     v[3],v[7],v[11],v[15]);				\
+	}								\
+} while (0)
+
+#define MAT4_GOT(m)			\
+	"[%.6f %.6f %.6f %.6f\n"	\
+	" %.6f %.6f %.6f %.6f\n"	\
+	" %.6f %.6f %.6f %.6f\n"	\
+	" %.6f %.6f %.6f %.6f]\n",	\
+	(m)[0],(m)[4],(m)[8], (m)[12],	\
+	(m)[1],(m)[5],(m)[9], (m)[13],	\
+	(m)[2],(m)[6],(m)[10],(m)[14],	\
+	(m)[3],(m)[7],(m)[11],(m)[15]
+
+START_TEST(test_mat4_equals)
+{
+	mat4_t a = MAT4(1.0f, 5.0f,  9.0f, 13.0f,
+			2.0f, 6.0f, 10.0f, 14.0f,
+			3.0f, 7.0f, 11.0f, 15.0f,
+			4.0f, 8.0f, 12.0f, 16.0f);
+	mat4_t b = MAT4(1.0f, 5.0f,  9.0f, 13.0f,
+			2.0f, 6.0f, 10.0f, 14.0f,
+			3.0f, 7.0f, 11.0f, 15.0f,
+			4.0f, 8.0f, 12.0f, 16.0f);
+	fail_unless(mat4_equals(a, b),
+		    "matrix equality expected");
+	b[0] = 31337.0f;
+	fail_if(mat4_equals(a, b),
+		"matrix unequality expected");
+}
+END_TEST
+
 START_TEST(test_mat4_copy)
 {
+	mat4_t a = MAT4(1.0f, 5.0f,  9.0f, 13.0f,
+			2.0f, 6.0f, 10.0f, 14.0f,
+			3.0f, 7.0f, 11.0f, 15.0f,
+			4.0f, 8.0f, 12.0f, 16.0f);
+	mat4_t b;
+	mat4_copy(b, a);
+	CHECK_MAT4(b, 1.0f, 5.0f,  9.0f, 13.0f,
+		      2.0f, 6.0f, 10.0f, 14.0f,
+		      3.0f, 7.0f, 11.0f, 15.0f,
+		      4.0f, 8.0f, 12.0f, 16.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_transform_vec3)
+{
+	mat4_t a = MAT4(1.0f, 0.0f, 0.0f,  5.0f,
+			0.0f, 1.0f, 0.0f, -5.0f,
+			0.0f, 0.0f, 1.0f,  3.0f,
+			0.0f, 0.0f, 0.0f,  1.0f);
+	vec3_t v = {0.0f, 0.0f, 0.0f};
+	mat4_transform_vec3(v, a);
+	CHECK_VEC3(v, 5.0f, -5.0f, 3.0f);
+
+	mat4_set_rotate_x(a, 45.0f);
+	vec3_set(v, 0.0f, 1.0f, 0.0f);
+	mat4_transform_vec3(v, a);
+	CHECK_VEC3(v, 0.0f, 0.7071067f, 0.7071067f);
+}
+END_TEST
+
+START_TEST(test_mat4_mul)
+{
+	mat4_t a = MAT4(1.0f, 2.0f, 3.0f, 4.0f,
+			5.0f, 6.0f, 7.0f, 8.0f,
+			8.0f, 7.0f, 6.0f, 5.0f,
+			4.0f, 3.0f, 2.0f, 1.0f);
+	mat4_t b = MAT4(8.0f, 7.0f, 6.0f, 5.0f,
+			4.0f, 3.0f, 2.0f, 1.0f,
+			1.0f, 2.0f, 3.0f, 4.0f,
+			5.0f, 6.0f, 7.0f, 8.0f);
+	mat4_t c;
+	mat4_mul(c, a, b);
+	CHECK_MAT4(c, 39.0f, 43.0f, 47.0f, 51.0f,
+		      111.0f, 115.0f, 119.0f, 123.0f,
+		      123.0f, 119.0f, 115.0f, 111.0f,
+		      51.0f, 47.0f, 43.0f, 39.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_is_identity)
+{
+	mat4_t a = MAT4(1.0f, 0.0f, 0.0f, 0.0f,
+			0.0f, 1.0f, 0.0f, 0.0f,
+			0.0f, 0.0f, 1.0f, 0.0f,
+			0.0f, 0.0f, 0.0f, 1.0f);
+	fail_unless(mat4_is_identity(a),
+		    "identity matrix expected, got:\n"
+		    MAT4_GOT(a));
+
+	a[0] = 2.0f;
+	fail_if(mat4_is_identity(a),
+		"non-identity matrix expected, got:\n"
+		MAT4_GOT(a));
+}
+END_TEST
+
+START_TEST(test_mat4_determinant)
+{
+	mat4_t a = MAT4(1.0f, 3.0f, 4.0f, 6.0f,
+			7.0f, 9.0f, 3.0f, 4.0f,
+			6.0f, 8.0f, 5.0f, 4.0f,
+			2.0f, 1.0f, 6.0f, 3.0f);
+	float det = mat4_determinant(a);
+	fail_unless(FLOATS_ARE_EQUAL(det, -184.0f),
+		    "%f determinant expected, got: %f", -184.0f, det);
+}
+END_TEST
+
+START_TEST(test_mat4_inverse)
+{
+	mat4_t b, a = MAT4(1.0f, 3.0f, 4.0f,  6.0f,
+			   7.0f, 9.0f, 3.0f,  4.0f,
+			   6.0f, 8.0f, 5.0f,  4.0f,
+			   2.0f, 1.0f, 6.0f, -6.0f);
+	mat4_inverse(b, a);
+	CHECK_MAT4(b, -11.285715, -21.714287, 29.428574, -6.142858,
+		      10.142858, 19.857143, -26.714287, 5.571429,
+		      -0.571429, -1.428571, 1.857143, -0.285714,
+		      -2.642857, -5.357143, 7.214286, -1.571429);
+}
+END_TEST
+
+START_TEST(test_mat4_set_identity)
+{
+	mat4_t a;
+	mat4_set_identity(a);
+	CHECK_MAT4(a, 1.0f, 0.0f, 0.0f, 0.0f,
+		      0.0f, 1.0f, 0.0f, 0.0f,
+		      0.0f, 0.0f, 1.0f, 0.0f,
+		      0.0f, 0.0f, 0.0f, 1.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_zero)
+{
+	mat4_t a;
+	mat4_set_zero(a);
+	CHECK_MAT4(a, 0.0f, 0.0f, 0.0f, 0.0f,
+		      0.0f, 0.0f, 0.0f, 0.0f,
+		      0.0f, 0.0f, 0.0f, 0.0f,
+		      0.0f, 0.0f, 0.0f, 0.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_rotate)
+{
+	mat4_t a;
+	vec3_t v;
+
+	mat4_set_rotate(a, VEC3_UNIT_X, 90.0f);
+	vec3_set(v, 0.0f, 1.0f, 0.0f);
+	mat4_transform_vec3(v, a);
+	CHECK_VEC3(v, 0.0f, 0.0f, 1.0f);
+
+	mat4_set_rotate(a, VEC3_UNIT_Z, 90.0f);
+	vec3_set(v, 1.0f, 0.0f, 0.0f);
+	mat4_transform_vec3(v, a);
+	CHECK_VEC3(v, 0.0f, 1.0f, 0.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_rotate_x)
+{
+	mat4_t a;
+	vec3_t v;
+
+	mat4_set_rotate_x(a, 45.0f);
+	vec3_set(v, 0.0f, 1.0f, 0.0f);
+	mat4_transform_vec3(v, a);
+	CHECK_VEC3(v, 0.0f, 0.7071067f, 0.7071067f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_rotate_y)
+{
+	mat4_t a;
+	vec3_t v;
+
+	mat4_set_rotate_y(a, 45.0f);
+	vec3_set(v, 0.0f, 0.0f, 1.0f);
+	mat4_transform_vec3(v, a);
+	CHECK_VEC3(v, 0.7071067f, 0.0f, 0.7071067f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_rotate_z)
+{
+	mat4_t a;
+	vec3_t v;
+
+	mat4_set_rotate_z(a, 45.0f);
+	vec3_set(v, 1.0f, 0.0f, 0.0f);
+	mat4_transform_vec3(v, a);
+	CHECK_VEC3(v, 0.7071067f, 0.7071067f, 0.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_scale)
+{
+	mat4_t a;
+
+	mat4_set_scale(a, (vec3_t){4.0f, 5.0f, 6.0f});
+	CHECK_MAT4(a, 4.0f, 0.0f, 0.0f, 0.0f,
+		      0.0f, 5.0f, 0.0f, 0.0f,
+		      0.0f, 0.0f, 6.0f, 0.0f,
+		      0.0f, 0.0f, 0.0f, 1.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_translate)
+{
+	mat4_t a;
+
+	mat4_set_translate(a, (vec3_t){-1.0f, -2.0f, -3.0f});
+	CHECK_MAT4(a, 1.0f, 0.0f, 0.0f, -1.0f,
+		      0.0f, 1.0f, 0.0f, -2.0f,
+		      0.0f, 0.0f, 1.0f, -3.0f,
+		      0.0f, 0.0f, 0.0f,  1.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_perspective)
+{
+	mat4_t a;
+
+	mat4_set_perspective(a, 85.0f, 1.333333f, 10.0f, 1000.0f);
+	CHECK_MAT4(a, 0.818482f, 0.0f, 0.0f, 0.0f,
+		      0.0f, 1.091309f, 0.0f, 0.0f,
+		      0.0f, 0.0f, -1.020202f, -20.202021f,
+		      0.0f, 0.0f, -1.0f, 0.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_ortho)
+{
+	mat4_t a;
+
+	mat4_set_ortho(a, 0.0f, 640.0f, 480.0f, 0.0f, -1.0f, 1.0f);
+	CHECK_MAT4(a, 0.003125f,  0.0f,       0.0f, -1.0f,
+		      0.0f,      -0.004167f,  0.0f,  1.0f,
+		      0.0f,       0.0f,      -1.0f,  0.0f,
+		      0.0f,       0.0f,       0.0f,  1.0f);
+}
+END_TEST
+
+START_TEST(test_mat4_set_look_at)
+{
+	mat4_t a;
+
+	mat4_set_look_at(a,
+			 (vec3_t){0.0f, 5.0f, 5.0f},
+			 (vec3_t){0.0f, 0.0f, 0.0f},
+			 VEC3_UNIT_Y);
+	CHECK_MAT4(a, 1.0f, 0.0f,        0.0f,        0.0f,
+		      0.0f, 0.7071067f, -0.7071067f,  0.0f,
+		      0.0f, 0.7071067f,  0.7071067f, -7.071068f,
+		      0.0f, 0.0f,        0.0f,        1.0f);
 }
 END_TEST
 
@@ -736,7 +1021,24 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_vec4, test_vec4_equals);
 
 	TCase *tc_mat4 = tcase_create("mat4");
+	tcase_add_test(tc_mat4, test_mat4_equals);
 	tcase_add_test(tc_mat4, test_mat4_copy);
+	tcase_add_test(tc_mat4, test_mat4_transform_vec3);
+	tcase_add_test(tc_mat4, test_mat4_mul);
+	tcase_add_test(tc_mat4, test_mat4_is_identity);
+	tcase_add_test(tc_mat4, test_mat4_determinant);
+	tcase_add_test(tc_mat4, test_mat4_inverse);
+	tcase_add_test(tc_mat4, test_mat4_set_identity);
+	tcase_add_test(tc_mat4, test_mat4_set_zero);
+	tcase_add_test(tc_mat4, test_mat4_set_rotate);
+	tcase_add_test(tc_mat4, test_mat4_set_rotate_x);
+	tcase_add_test(tc_mat4, test_mat4_set_rotate_y);
+	tcase_add_test(tc_mat4, test_mat4_set_rotate_z);
+	tcase_add_test(tc_mat4, test_mat4_set_scale);
+	tcase_add_test(tc_mat4, test_mat4_set_translate);
+	tcase_add_test(tc_mat4, test_mat4_set_perspective);
+	tcase_add_test(tc_mat4, test_mat4_set_ortho);
+	tcase_add_test(tc_mat4, test_mat4_set_look_at);
 
 	suite_add_tcase(s, tc_vec2);
 	suite_add_tcase(s, tc_vec3);

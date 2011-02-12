@@ -79,6 +79,8 @@ void mat4_transform_vec3(vec3_t v, const mat4_t m)
 	vec3_copy(v, r);
 }
 
+// Resulting matrix is the m2 in the coordinate system of m1.
+// In other words we're transforming m2 coordinate system by m1.
 void mat4_mul(mat4_t out, const mat4_t m1, const mat4_t m2)
 {
 	out[0]  = m1[0] * m2[0]  + m1[4] * m2[1]  + m1[8]  * m2[2]  + m1[12] * m2[3];
@@ -174,7 +176,7 @@ void mat4_inverse(mat4_t out, const mat4_t m)
 	float d, id;
 
 	d = mat4_determinant(m);
-	if (d < MATH_EPSILON)
+	if (fabs(d) < MATH_EPSILON)
 		return;
 	id = 1.0f / d;
 	out[0]  =  (m[5] * (m[10] * m[15] - m[14] * m[11]) - m[9] * (m[6] * m[15] - m[14] * m[7]) + m[13] * (m[6] * m[11] - m[10] * m[7])) * id;
