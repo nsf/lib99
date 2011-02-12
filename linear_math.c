@@ -176,6 +176,7 @@ void mat4_inverse(mat4_t out, const mat4_t m)
 	float d, id;
 
 	d = mat4_determinant(m);
+	// TODO: wtf?
 	if (fabs(d) < MATH_EPSILON)
 		return;
 	id = 1.0f / d;
