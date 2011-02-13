@@ -1056,6 +1056,69 @@ START_TEST(test_quat_from_mat4)
 }
 END_TEST
 
+START_TEST(test_quat_from_angle)
+{
+	mat4_t m;
+	quat_t q;
+
+	vec3_t a = {0.0f, 1.0f, 0.0f};
+	vec3_t b = {0.0f, 1.0f, 0.0f};
+	vec3_t axis = {1.0f, 1.0f, 1.0f};
+	vec3_normalize(axis);
+
+	mat4_set_rotate(m, axis, 45.0f);
+	quat_from_angle(q, axis, 45.0f);
+
+	mat4_transform_vec3(a, m);
+	quat_transform_vec3(b, q);
+
+	fail_unless(vec3_nearly_equals(a, b),
+		    "vector near equality expected, got: "
+		    "(%f,%f,%f) != (%f,%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_Z(a),
+		    VEC_X(b), VEC_Y(b), VEC_Z(b));
+}
+END_TEST
+
+START_TEST(test_quat_to_mat4)
+{
+	mat4_t a, b;
+	quat_t q;
+
+	vec3_t axis = {1.0f, 1.0f, 1.0f};
+	vec3_normalize(axis);
+
+	mat4_set_rotate(a, axis, 45.0f);
+	quat_from_angle(q, axis, 45.0f);
+	quat_to_mat4(b, q);
+
+	fail_unless(mat4_nearly_equals(a, b),
+		    "matrix near equality expected");
+}
+END_TEST
+
+START_TEST(test_quat_transform_vec3)
+{
+	quat_t q;
+	vec3_t a = {0.0f, 1.0f, 0.0f};
+
+	quat_from_angle(q, VEC3_UNIT_X, 90.0f);
+	quat_transform_vec3(a, q);
+	CHECK_VEC3(a, 0.0f, 0.0f, 1.0f);
+}
+END_TEST
+
+START_TEST(test_quat_mul)
+{
+	quat_t a = {2.0f, 3.0f, 4.0f, 1.0f};
+	quat_t b = {-6.0f, 7.0f, -8.0f, 5.0f};
+	quat_t c;
+
+	quat_mul(c, a, b);
+	CHECK_QUAT(c, -48.0f, 14.0f, 44.0f, 28.0f);
+}
+END_TEST
+
 Suite *linear_math_suite()
 {
 	Suite *s = suite_create("linear_math");
@@ -1165,6 +1228,11 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_quat, test_quat_conjugate);
 	tcase_add_test(tc_quat, test_quat_copy);
 	tcase_add_test(tc_quat, test_quat_from_mat4);
+	tcase_add_test(tc_quat, test_quat_from_angle);
+	tcase_add_test(tc_quat, test_quat_to_mat4);
+	tcase_add_test(tc_quat, test_quat_transform_vec3);
+	//tcase_add_test(tc_quat, test_quat_slerp);
+	tcase_add_test(tc_quat, test_quat_mul);
 
 	suite_add_tcase(s, tc_vec2);
 	suite_add_tcase(s, tc_vec3);
