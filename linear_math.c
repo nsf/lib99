@@ -106,6 +106,26 @@ void mat4_mul(mat4_t out, const mat4_t m1, const mat4_t m2)
 
 bool mat4_equals(const mat4_t m1, const mat4_t m2)
 {
+	return (m1[0] == m2[0] &&
+		m1[1] == m2[1] &&
+		m1[2] == m2[2] &&
+		m1[3] == m2[3] &&
+		m1[4] == m2[4] &&
+		m1[5] == m2[5] &&
+		m1[6] == m2[6] &&
+		m1[7] == m2[7] &&
+		m1[8] == m2[8] &&
+		m1[9] == m2[9] &&
+		m1[10] == m2[10] &&
+		m1[11] == m2[11] &&
+		m1[12] == m2[12] &&
+		m1[13] == m2[13] &&
+		m1[14] == m2[14] &&
+		m1[15] == m2[15]);
+}
+
+bool mat4_nearly_equals(const mat4_t m1, const mat4_t m2)
+{
 	return (fabs(m1[0] - m2[0])   < MATH_EPSILON &&
 		fabs(m1[1] - m2[1])   < MATH_EPSILON &&
 		fabs(m1[2] - m2[2])   < MATH_EPSILON &&
@@ -122,7 +142,6 @@ bool mat4_equals(const mat4_t m1, const mat4_t m2)
 		fabs(m1[13] - m2[13]) < MATH_EPSILON &&
 		fabs(m1[14] - m2[14]) < MATH_EPSILON &&
 		fabs(m1[15] - m2[15]) < MATH_EPSILON);
-
 }
 
 void mat4_set_identity(mat4_t out)
@@ -373,15 +392,18 @@ void quat_from_mat4(quat_t out, const mat4_t m)
 	} else {
 		static int next[3] = { 1, 2, 0 };
 		int i = 0;
-		if (m[5] > m[0]) i = 1;
-		if (m[10] > m[4 * i + i]) i = 2;
+		if (m[5] > m[0])
+			i = 1;
+		if (m[10] > m[4 * i + i])
+			i = 2;
 		int j = next[i];
 		int k = next[j];
 		float s = sqrtf(m[4 * i + i] -
 				m[4 * j + j] -
 				m[4 * k + k] + 1.0f);
 		out[i] = 0.5f * s;
-		if (s != 0) s = 0.5f / s;
+		if (s != 0)
+			s = 0.5f / s;
 		out[3] = (m[4 * j + k] - m[4 * k + j]) * s;
 		out[j] = (m[4 * i + j] + m[4 * j + i]) * s;
 		out[k] = (m[4 * i + k] + m[4 * k + i]) * s;
@@ -414,6 +436,20 @@ void quat_to_mat4(mat4_t out, const quat_t q)
 	out[1] = xy + wz;          out[5] = 1.0f - (xx + zz); out[9]  = yz - wx;          out[13] = 0.0f;
 	out[2] = xz - wy;          out[6] = yz + wx;          out[10] = 1.0f - (xx + yy); out[14] = 0.0f;
 	out[3] = 0.0f;             out[7] = 0.0f;             out[11] = 0.0f;             out[15] = 1.0f;
+}
+
+void quat_transform_vec3(vec3_t out, const quat_t q)
+{
+	quat_t conj, tmp;
+	quat_t v;
+
+	quat_conjugate(conj, q);
+	vec3_copy(v, out);
+	QUAT_W(v) = 0.0f;
+
+	quat_mul(tmp, q, v);
+	quat_mul(v, tmp, conj);
+	vec3_copy(out, v);
 }
 
 void quat_slerp(quat_t out, const quat_t q1, const quat_t q2, float t)
@@ -455,8 +491,7 @@ void quat_from_angle(quat_t out, const vec3_t dir, float angle)
 	out[3] = 1.0f;
 
 	float length = vec3_length(dir);
-	if (length != 0.0f)
-	{
+	if (length != 0.0f) {
 		float halfangle = angle * MATH_DEG_TO_RAD / 2.0f;
 		length = 1.0f / length;
 		float sinangle = sinf(halfangle);

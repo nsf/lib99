@@ -1,7 +1,7 @@
 #include "linear_math.h"
 #include <check.h>
 
-#define FLOATS_ARE_EQUAL(a, b) (fabs((a) - (b)) < MATH_EPSILON)
+#define FLOATS_ARE_NEARLY_EQUAL(a, b) (fabs((a) - (b)) < MATH_EPSILON)
 
 /**************************************************************************
   vec2: two-dimensional vector
@@ -9,10 +9,11 @@
 
 #define CHECK_VEC2(v, x, y)						\
 do {									\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_X(v), x),			\
-		    "%f X value expected, got: %f", (x), VEC_X(v));	\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_Y(v), y),			\
-		    "%f Y value expected, got: %f", (y), VEC_Y(v));	\
+	if (!vec2_nearly_equals(v, (vec2_t){x, y})) {			\
+		fail("vectors equality expected, got: "			\
+		     "(%f,%f) != (%f,%f)",				\
+		     (x), (y), VEC_X(v), VEC_Y(v));			\
+	}								\
 } while (0)
 
 START_TEST(test_vec2_adda)
@@ -184,7 +185,7 @@ START_TEST(test_vec2_length2)
 {
 	vec2_t a = {4.0f, 3.0f};
 	float len2 = vec2_length2(a);
-	fail_unless(FLOATS_ARE_EQUAL(len2, 25.0f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(len2, 25.0f),
 		    "%f length2 expected, got: %f", 25.0f, len2);
 }
 END_TEST
@@ -193,7 +194,7 @@ START_TEST(test_vec2_length)
 {
 	vec2_t a = {4.0f, 3.0f};
 	float len = vec2_length(a);
-	fail_unless(FLOATS_ARE_EQUAL(len, 5.0f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(len, 5.0f),
 		    "%f length expected, got: %f", 5.0f, len);
 
 }
@@ -218,13 +219,13 @@ START_TEST(test_vec2_distance)
 	vec2_t a = {5.0f, 4.0f};
 	vec2_t b = {1.0f, 1.0f};
 	float distance = vec2_distance(a, b);
-	fail_unless(FLOATS_ARE_EQUAL(distance, 5.0f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(distance, 5.0f),
 		    "%f distance expected, got: %f", 5.0f, distance);
 
 	vec2_set(a, 4.0f, 5.0f);
 	vec2_set(b, 4.7071067f, 5.7071067f);
 	distance = vec2_distance(a, b);
-	fail_unless(FLOATS_ARE_EQUAL(distance, 1.0f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(distance, 1.0f),
 		    "%f distance expected, got: %f", 1.0f, distance);
 }
 END_TEST
@@ -234,7 +235,7 @@ START_TEST(test_vec2_distance2)
 	vec2_t a = {-3.0f, -4.0f};
 	vec2_t b = {0.0f, 0.0f};
 	float d2 = vec2_distance2(a, b);
-	fail_unless(FLOATS_ARE_EQUAL(d2, 25.0f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(d2, 25.0f),
 		    "%f distance2 expected, got: %f", 25.0f, d2);
 }
 END_TEST
@@ -255,12 +256,27 @@ START_TEST(test_vec2_equals)
 }
 END_TEST
 
+START_TEST(test_vec2_nearly_equals)
+{
+	vec2_t a = {5.4f, 0.0f};
+	vec2_t b = {5.399999999f, -0.0f};
+	fail_unless(vec2_nearly_equals(a, b),
+		    "vectors near equality expected, got: (%f,%f) != (%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_X(b), VEC_Y(b));
+
+	VEC_Y(b) = 50.0f;
+	fail_if(vec2_nearly_equals(a, b),
+		"vectors unequality expected, got: (%f,%f) != (%f,%f)",
+		VEC_X(a), VEC_Y(a), VEC_X(b), VEC_Y(b));
+}
+END_TEST
+
 START_TEST(test_vec2_dot)
 {
 	vec2_t a = {4.3f, 7.6f};
 	vec2_t b = {2.0f, -2.0f};
 	float dot = vec2_dot(a, b);
-	fail_unless(FLOATS_ARE_EQUAL(dot, -6.6f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(dot, -6.6f),
 		    "%f dot product expected, got: %f", -6.6f, dot);
 }
 END_TEST
@@ -287,12 +303,11 @@ END_TEST
 
 #define CHECK_VEC3(v, x, y, z)						\
 do {									\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_X(v), x),			\
-		    "%f X value expected, got: %f", (x), VEC_X(v));	\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_Y(v), y),			\
-		    "%f Y value expected, got: %f", (y), VEC_Y(v));	\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_Z(v), z),			\
-		    "%f Z value expected, got: %f", (z), VEC_Z(v));	\
+	if (!vec3_nearly_equals(v, (vec3_t){x, y, z})) {		\
+		fail("vector near equality expected, got: "		\
+		     "(%f,%f,%f) != (%f,%f,%f)",			\
+		     (x), (y), (z), VEC_X(v), VEC_Y(v), VEC_Z(v));	\
+	}								\
 } while (0)
 
 START_TEST(test_vec3_adda)
@@ -463,7 +478,7 @@ START_TEST(test_vec3_length2)
 {
 	vec3_t a = {1.0f, 1.0f, 1.0f};
 	float len2 = vec3_length2(a);
-	fail_unless(FLOATS_ARE_EQUAL(len2, 3.0f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(len2, 3.0f),
 		    "%f length2 expected, got: %f", 3.0f, len2);
 }
 END_TEST
@@ -472,7 +487,7 @@ START_TEST(test_vec3_length)
 {
 	vec3_t a = {5.0f, 5.0f, 5.0f};
 	float len = vec3_length(a);
-	fail_unless(FLOATS_ARE_EQUAL(len, 8.66025403f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(len, 8.66025403f),
 		    "%f length expected, got: %f", 8.66025403f, len);
 }
 END_TEST
@@ -498,7 +513,7 @@ START_TEST(test_vec3_distance)
 	vec3_t a = {5.0f, 0.0f, 5.0f};
 	vec3_t b = {0.0f, 5.0f, 0.0f};
 	float d = vec3_distance(a, b);
-	fail_unless(FLOATS_ARE_EQUAL(d, 8.66025403f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(d, 8.66025403f),
 		    "%f distance expected, got: %f", 8.66025403f, d);
 }
 END_TEST
@@ -508,7 +523,7 @@ START_TEST(test_vec3_distance2)
 	vec3_t a = {4.5f, 7.8f, -3.3f};
 	vec3_t b = {1.2f, -7.5f, 4.8f};
 	float d2 = vec3_distance2(a, b);
-	fail_unless(FLOATS_ARE_EQUAL(d2, 310.590027f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(d2, 310.590027f),
 		    "%f distance2 expected, got: %f", 310.590027f, d2);
 }
 END_TEST
@@ -518,7 +533,7 @@ START_TEST(test_vec3_dot)
 	vec3_t a = {1.3f, -1.5f, -7.0f};
 	vec3_t b = {5.4f, 3.0f, 0.0f};
 	float dot = vec3_dot(a, b);
-	fail_unless(FLOATS_ARE_EQUAL(dot, 2.52f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(dot, 2.52f),
 		    "f%f dot product expected, got: %f", 2.52f, dot);
 }
 END_TEST
@@ -564,6 +579,23 @@ START_TEST(test_vec3_equals)
 }
 END_TEST
 
+START_TEST(test_vec3_nearly_equals)
+{
+	vec3_t a = {0.0f, -3.1415f, 5.16f};
+	vec3_t b = {-0.0f, -3.1415f, 5.1599999999f};
+	fail_unless(vec3_nearly_equals(a, b),
+		    "vectors near equality expected, got: (%f,%f,%f) != (%f,%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_Z(a),
+		    VEC_X(b), VEC_Y(b), VEC_Z(b));
+
+	vec3_set(b, 1.0f, 1.0f, 5.16f);
+	fail_if(vec3_nearly_equals(a, b),
+		"vectors unequality expected, got: (%f,%f,%f) != (%f,%f,%f)",
+		VEC_X(a), VEC_Y(a), VEC_Z(a),
+		VEC_X(b), VEC_Y(b), VEC_Z(b));
+}
+END_TEST
+
 START_TEST(test_vec3_rotate)
 {
 	vec3_t a;
@@ -593,14 +625,12 @@ END_TEST
 
 #define CHECK_VEC4(v, x, y, z, w)					\
 do {									\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_X(v), x),			\
-		    "%f X value expected, got: %f", (x), VEC_X(v));	\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_Y(v), y),			\
-		    "%f Y value expected, got: %f", (y), VEC_Y(v));	\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_Z(v), z),			\
-		    "%f Z value expected, got: %f", (z), VEC_Z(v));	\
-	fail_unless(FLOATS_ARE_EQUAL(VEC_W(v), w),			\
-		    "%f W value expected, got: %f", (w), VEC_W(v));	\
+	if (!vec4_nearly_equals(v, (vec4_t){x, y, z, w})) {		\
+		fail("vectors near equality expected, got: "		\
+		     "(%f,%f,%f,%f) != (%f,%f,%f,%f)",			\
+		     (x), (y), (z), (w),				\
+		     VEC_X(v), VEC_Y(v), VEC_Z(v), VEC_W(v));		\
+	}								\
 } while (0)
 
 
@@ -645,6 +675,23 @@ START_TEST(test_vec4_equals)
 }
 END_TEST
 
+START_TEST(test_vec4_nearly_equals)
+{
+	vec4_t a = {0.0f, 8.2f, 9.5f, -3.3f};
+	vec4_t b = {-0.0f, 8.19999999f, 9.5f, -3.3f};
+	fail_unless(vec4_nearly_equals(a, b),
+		    "vectors near equality expected, got: (%f,%f,%f,%f) != (%f,%f,%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_Z(a), VEC_W(a),
+		    VEC_X(b), VEC_Y(b), VEC_Z(b), VEC_W(b));
+
+	VEC_W(b) = 10.0f;
+	fail_if(vec4_nearly_equals(a, b),
+		"vectors unequality expected, got: (%f,%f,%f,%f) != (%f,%f,%f,%f)",
+		VEC_X(a), VEC_Y(a), VEC_Z(a), VEC_W(a),
+		VEC_X(b), VEC_Y(b), VEC_Z(b), VEC_W(b));
+}
+END_TEST
+
 /**************************************************************************
   mat4: 4x4 OpenGL (column-major) matrix
 **************************************************************************/
@@ -657,7 +704,7 @@ END_TEST
 do {									\
 	mat4_t m = {m0,m1,m2,m3,m4,m5,m6,m7,m8,				\
 		    m9,m10,m11,m12,m13,m14,m15};			\
-	if (!mat4_equals(v, m)) {					\
+	if (!mat4_nearly_equals(v, m)) {				\
 		fail("expected:\n"					\
 		     "[%.6f %.6f %.6f %.6f\n"				\
 		     " %.6f %.6f %.6f %.6f\n"				\
@@ -707,6 +754,24 @@ START_TEST(test_mat4_equals)
 }
 END_TEST
 
+START_TEST(test_mat4_nearly_equals)
+{
+	mat4_t a = MAT4(0.0f, 5.0f,  9.0f, 13.0f,
+			2.0f, 6.0f, 10.0f, 14.0f,
+			3.0f, 7.0f, 11.0f, 15.0f,
+			4.0f, 8.0f, 12.0f, 16.0f);
+	mat4_t b = MAT4(-0.0f, 5.0f,  9.0f, 13.0f,
+			 2.0f, 6.0f, 10.0f, 14.0f,
+			 3.0f, 7.0f, 11.0f, 15.0f,
+			 4.0f, 7.9999999f, 12.0f, 16.0f);
+	fail_unless(mat4_nearly_equals(a, b),
+		    "matrix near equality expected");
+	b[0] = 31337.0f;
+	fail_if(mat4_nearly_equals(a, b),
+		"matrix unequality expected");
+}
+END_TEST
+
 START_TEST(test_mat4_copy)
 {
 	mat4_t a = MAT4(1.0f, 5.0f,  9.0f, 13.0f,
@@ -728,14 +793,14 @@ START_TEST(test_mat4_transform_vec3)
 			0.0f, 1.0f, 0.0f, -5.0f,
 			0.0f, 0.0f, 1.0f,  3.0f,
 			0.0f, 0.0f, 0.0f,  1.0f);
-	vec3_t v = {0.0f, 0.0f, 0.0f};
-	mat4_transform_vec3(v, a);
-	CHECK_VEC3(v, 5.0f, -5.0f, 3.0f);
+	vec3_t b = {0.0f, 0.0f, 0.0f};
+	mat4_transform_vec3(b, a);
+	CHECK_VEC3(b, 5.0f, -5.0f, 3.0f);
 
 	mat4_set_rotate_x(a, 45.0f);
-	vec3_set(v, 0.0f, 1.0f, 0.0f);
-	mat4_transform_vec3(v, a);
-	CHECK_VEC3(v, 0.0f, 0.7071067f, 0.7071067f);
+	vec3_set(b, 0.0f, 1.0f, 0.0f);
+	mat4_transform_vec3(b, a);
+	CHECK_VEC3(b, 0.0f, 0.7071067f, 0.7071067f);
 }
 END_TEST
 
@@ -782,7 +847,7 @@ START_TEST(test_mat4_determinant)
 			6.0f, 8.0f, 5.0f, 4.0f,
 			2.0f, 1.0f, 6.0f, 3.0f);
 	float det = mat4_determinant(a);
-	fail_unless(FLOATS_ARE_EQUAL(det, -184.0f),
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(det, -184.0f),
 		    "%f determinant expected, got: %f", -184.0f, det);
 }
 END_TEST
@@ -826,53 +891,53 @@ END_TEST
 START_TEST(test_mat4_set_rotate)
 {
 	mat4_t a;
-	vec3_t v;
+	vec3_t b;
 
 	mat4_set_rotate(a, VEC3_UNIT_X, 90.0f);
-	vec3_set(v, 0.0f, 1.0f, 0.0f);
-	mat4_transform_vec3(v, a);
-	CHECK_VEC3(v, 0.0f, 0.0f, 1.0f);
+	vec3_set(b, 0.0f, 1.0f, 0.0f);
+	mat4_transform_vec3(b, a);
+	CHECK_VEC3(b, 0.0f, 0.0f, 1.0f);
 
 	mat4_set_rotate(a, VEC3_UNIT_Z, 90.0f);
-	vec3_set(v, 1.0f, 0.0f, 0.0f);
-	mat4_transform_vec3(v, a);
-	CHECK_VEC3(v, 0.0f, 1.0f, 0.0f);
+	vec3_set(b, 1.0f, 0.0f, 0.0f);
+	mat4_transform_vec3(b, a);
+	CHECK_VEC3(b, 0.0f, 1.0f, 0.0f);
 }
 END_TEST
 
 START_TEST(test_mat4_set_rotate_x)
 {
 	mat4_t a;
-	vec3_t v;
+	vec3_t b;
 
 	mat4_set_rotate_x(a, 45.0f);
-	vec3_set(v, 0.0f, 1.0f, 0.0f);
-	mat4_transform_vec3(v, a);
-	CHECK_VEC3(v, 0.0f, 0.7071067f, 0.7071067f);
+	vec3_set(b, 0.0f, 1.0f, 0.0f);
+	mat4_transform_vec3(b, a);
+	CHECK_VEC3(b, 0.0f, 0.7071067f, 0.7071067f);
 }
 END_TEST
 
 START_TEST(test_mat4_set_rotate_y)
 {
 	mat4_t a;
-	vec3_t v;
+	vec3_t b;
 
 	mat4_set_rotate_y(a, 45.0f);
-	vec3_set(v, 0.0f, 0.0f, 1.0f);
-	mat4_transform_vec3(v, a);
-	CHECK_VEC3(v, 0.7071067f, 0.0f, 0.7071067f);
+	vec3_set(b, 0.0f, 0.0f, 1.0f);
+	mat4_transform_vec3(b, a);
+	CHECK_VEC3(b, 0.7071067f, 0.0f, 0.7071067f);
 }
 END_TEST
 
 START_TEST(test_mat4_set_rotate_z)
 {
 	mat4_t a;
-	vec3_t v;
+	vec3_t b;
 
 	mat4_set_rotate_z(a, 45.0f);
-	vec3_set(v, 1.0f, 0.0f, 0.0f);
-	mat4_transform_vec3(v, a);
-	CHECK_VEC3(v, 0.7071067f, 0.7071067f, 0.0f);
+	vec3_set(b, 1.0f, 0.0f, 0.0f);
+	mat4_transform_vec3(b, a);
+	CHECK_VEC3(b, 0.7071067f, 0.7071067f, 0.0f);
 }
 END_TEST
 
@@ -939,6 +1004,58 @@ START_TEST(test_mat4_set_look_at)
 }
 END_TEST
 
+/**************************************************************************
+  quat: quaterion representing rotation
+**************************************************************************/
+
+#define CHECK_QUAT(v, x, y, z, w)					\
+do {									\
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(QUAT_X(v), x),		\
+		    "%f X value expected, got: %f", (x), QUAT_X(v));	\
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(QUAT_Y(v), y),		\
+		    "%f Y value expected, got: %f", (y), QUAT_Y(v));	\
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(QUAT_Z(v), z),		\
+		    "%f Z value expected, got: %f", (z), QUAT_Z(v));	\
+	fail_unless(FLOATS_ARE_NEARLY_EQUAL(QUAT_W(v), w),		\
+		    "%f W value expected, got: %f", (w), QUAT_W(v));	\
+} while (0)
+
+START_TEST(test_quat_conjugate)
+{
+	quat_t b, a = {1.0f, 1.0f, 1.0f, 1.0f};
+	quat_conjugate(b, a);
+	CHECK_QUAT(b, -1.0f, -1.0f, -1.0f, 1.0f);
+}
+END_TEST
+
+START_TEST(test_quat_copy)
+{
+	quat_t b, a = {1.0f, -2.0f, 3.0f, -4.0f};
+	quat_copy(b, a);
+	CHECK_QUAT(b, 1.0f, -2.0f, 3.0f, -4.0f);
+}
+END_TEST
+
+START_TEST(test_quat_from_mat4)
+{
+	mat4_t m;
+	quat_t q;
+	vec3_t a = {0.0f, 1.0f, 0.0f};
+	vec3_t b = {0.0f, 1.0f, 0.0f};
+
+	mat4_set_rotate_x(m, 90.0f);
+	quat_from_mat4(q, m);
+	mat4_transform_vec3(a, m);
+	quat_transform_vec3(b, q);
+
+	fail_unless(vec3_nearly_equals(a, b),
+		    "vector near equality expected, got: "
+		    "(%f,%f,%f) != (%f,%f,%f)",
+		    VEC_X(a), VEC_Y(a), VEC_Z(a),
+		    VEC_X(b), VEC_Y(b), VEC_Z(b));
+}
+END_TEST
+
 Suite *linear_math_suite()
 {
 	Suite *s = suite_create("linear_math");
@@ -974,6 +1091,7 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_vec2, test_vec2_distance);
 	tcase_add_test(tc_vec2, test_vec2_distance2);
 	tcase_add_test(tc_vec2, test_vec2_equals);
+	tcase_add_test(tc_vec2, test_vec2_nearly_equals);
 	tcase_add_test(tc_vec2, test_vec2_dot);
 	tcase_add_test(tc_vec2, test_vec2_rotate);
 
@@ -1012,6 +1130,7 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_vec3, test_vec3_cross);
 	tcase_add_test(tc_vec3, test_vec3_advance);
 	tcase_add_test(tc_vec3, test_vec3_equals);
+	tcase_add_test(tc_vec3, test_vec3_nearly_equals);
 	tcase_add_test(tc_vec3, test_vec3_rotate);
 
 	TCase *tc_vec4 = tcase_create("vec4");
@@ -1019,9 +1138,11 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_vec4, test_vec4_neg);
 	tcase_add_test(tc_vec4, test_vec4_copy);
 	tcase_add_test(tc_vec4, test_vec4_equals);
+	tcase_add_test(tc_vec4, test_vec4_nearly_equals);
 
 	TCase *tc_mat4 = tcase_create("mat4");
 	tcase_add_test(tc_mat4, test_mat4_equals);
+	tcase_add_test(tc_mat4, test_mat4_nearly_equals);
 	tcase_add_test(tc_mat4, test_mat4_copy);
 	tcase_add_test(tc_mat4, test_mat4_transform_vec3);
 	tcase_add_test(tc_mat4, test_mat4_mul);
@@ -1040,9 +1161,15 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_mat4, test_mat4_set_ortho);
 	tcase_add_test(tc_mat4, test_mat4_set_look_at);
 
+	TCase *tc_quat = tcase_create("quat");
+	tcase_add_test(tc_quat, test_quat_conjugate);
+	tcase_add_test(tc_quat, test_quat_copy);
+	tcase_add_test(tc_quat, test_quat_from_mat4);
+
 	suite_add_tcase(s, tc_vec2);
 	suite_add_tcase(s, tc_vec3);
 	suite_add_tcase(s, tc_vec4);
 	suite_add_tcase(s, tc_mat4);
+	suite_add_tcase(s, tc_quat);
 	return s;
 }

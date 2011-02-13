@@ -83,6 +83,11 @@ enum frustum_plane {
 #define VEC_Z(v) ((v)[2])
 #define VEC_W(v) ((v)[3])
 
+#define QUAT_X(q) ((q)[0])
+#define QUAT_Y(q) ((q)[1])
+#define QUAT_Z(q) ((q)[2])
+#define QUAT_W(q) ((q)[3])
+
 // TODO: wrong?
 #define MAT4_RC(m, row, column) ((m)[(row)*4+(column)])
 
@@ -369,6 +374,12 @@ static inline bool vec2_equals(const vec2_t v1, const vec2_t v2)
 	return (VEC_X(v1) == VEC_X(v2) && VEC_Y(v1) == VEC_Y(v2));
 }
 
+static inline bool vec2_nearly_equals(const vec2_t v1, const vec2_t v2)
+{
+	return (fabs(VEC_X(v1) - VEC_X(v2)) < MATH_EPSILON &&
+		fabs(VEC_Y(v1) - VEC_Y(v2)) < MATH_EPSILON);
+}
+
 static inline float vec2_dot(const vec2_t v1, const vec2_t v2)
 {
 	return (VEC_X(v1)*VEC_X(v2) + VEC_Y(v1)*VEC_Y(v2));
@@ -640,6 +651,13 @@ static inline bool vec3_equals(const vec3_t v1, const vec3_t v2)
 	return (VEC_X(v1) == VEC_X(v2) && VEC_Y(v1) == VEC_Y(v2) && VEC_Z(v1) == VEC_Z(v2));
 }
 
+static inline bool vec3_nearly_equals(const vec3_t v1, const vec3_t v2)
+{
+	return (fabs(VEC_X(v1) - VEC_X(v2)) < MATH_EPSILON &&
+		fabs(VEC_Y(v1) - VEC_Y(v2)) < MATH_EPSILON &&
+		fabs(VEC_Z(v1) - VEC_Z(v2)) < MATH_EPSILON);
+}
+
 // for left-handed coordinate system, rotation is CW, when specified axis goes
 // towards you
 void vec3_rotate_x(vec3_t out, float deg, const vec3_t origin);
@@ -679,11 +697,20 @@ static inline bool vec4_equals(const vec4_t v1, const vec4_t v2)
 		VEC_W(v1) == VEC_W(v2));
 }
 
+static inline bool vec4_nearly_equals(const vec4_t v1, const vec4_t v2)
+{
+	return (fabs(VEC_X(v1) - VEC_X(v2)) < MATH_EPSILON &&
+		fabs(VEC_Y(v1) - VEC_Y(v2)) < MATH_EPSILON &&
+		fabs(VEC_Z(v1) - VEC_Z(v2)) < MATH_EPSILON &&
+		fabs(VEC_W(v1) - VEC_W(v2)) < MATH_EPSILON);
+}
+
 /**************************************************************************
   mat4: 4x4 OpenGL (column-major) matrix
 **************************************************************************/
 
 bool mat4_equals(const mat4_t m1, const mat4_t m2);
+bool mat4_nearly_equals(const mat4_t m1, const mat4_t m2);
 void mat4_copy(mat4_t out, const mat4_t m);
 void mat4_transform_vec3(vec3_t v, const mat4_t m);
 void mat4_mul(mat4_t out, const mat4_t m1, const mat4_t m2);
@@ -722,6 +749,7 @@ static inline void quat_copy(quat_t out, const quat_t q)
 void quat_from_mat4(quat_t out, const mat4_t m);
 void quat_from_angle(quat_t out, const vec3_t dir, float angle);
 void quat_to_mat4(mat4_t out, const quat_t q);
+void quat_transform_vec3(vec3_t out, const quat_t q);
 void quat_slerp(quat_t out, const quat_t q1, const quat_t q2, float t);
 void quat_mul(quat_t out, const quat_t q1, const quat_t q2);
 
