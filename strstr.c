@@ -34,18 +34,6 @@ static int is_cstr_in_str(struct str *str, const char *cstr)
 	return 0;
 }
 
-static void str_add_cstr_len(struct str **str, const char *data, unsigned int len)
-{
-	if (!len)
-		return;
-
-	str_ensure_cap(str, len);
-
-	struct str *s = *str;
-	memcpy(&s->data[s->len], data, len + 1);
-	s->len += len;
-}
-
 //------------------------------------------------------------------------------
 
 struct str *str_new(unsigned int cap)
@@ -182,6 +170,18 @@ void str_add_cstr(struct str **str, const char *cstr)
 	assert(!is_cstr_in_str(*str, cstr));
 
 	str_add_cstr_len(str, cstr, strlen(cstr));
+}
+
+void str_add_cstr_len(struct str **str, const char *data, unsigned int len)
+{
+	if (!len)
+		return;
+
+	str_ensure_cap(str, len);
+
+	struct str *s = *str;
+	memcpy(&s->data[s->len], data, len + 1);
+	s->len += len;
 }
 
 void str_add_printf(struct str **str, const char *fmt, ...)

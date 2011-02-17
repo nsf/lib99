@@ -63,7 +63,7 @@ void str_ensure_cap(struct str **str, unsigned int n);
 /* appending to a str */
 void str_add_str(struct str **str, const struct str *str2);
 void str_add_cstr(struct str **str, const char *cstr);
-//void str_add_cstr_len(struct str **str, const char *cstr, unsigned int len);
+void str_add_cstr_len(struct str **str, const char *cstr, unsigned int len);
 void str_add_printf(struct str **str, const char *fmt, ...);
 void str_add_file(struct str **str, const char *filename);
 

@@ -177,6 +177,26 @@ START_TEST(test_str_add_cstr)
 }
 END_TEST
 
+START_TEST(test_str_add_cstr_len)
+{
+	struct str *str = str_from_cstr("123");
+	str_add_cstr_len(&str, "456", 3);
+	CHECK_STR(str, >= 6, == 6, "123456");
+	str_free(str);
+
+	str = str_new(0);
+	str_add_cstr_len(&str, "12345", 0);
+	str_add_cstr_len(&str, "12345", 1);
+	str_add_cstr_len(&str, "12345", 2);
+	str_add_cstr_len(&str, "12345", 3);
+	str_add_cstr_len(&str, "12345", 4);
+	str_add_cstr_len(&str, "12345", 5);
+	str_add_cstr_len(&str, "12345", 0);
+	CHECK_STR(str, >= 15, == 15, "112123123412345");
+	str_free(str);
+}
+END_TEST
+
 START_TEST(test_str_add_printf)
 {
 	struct str *str = str_from_cstr("123");
@@ -370,6 +390,7 @@ Suite *strstr_suite()
 
 	tcase_add_test(tc_str, test_str_add_str);
 	tcase_add_test(tc_str, test_str_add_cstr);
+	tcase_add_test(tc_str, test_str_add_cstr_len);
 	tcase_add_test(tc_str, test_str_add_printf);
 	tcase_add_test(tc_str, test_str_add_file);
 
