@@ -22,6 +22,19 @@
  * String data is always a correct C string.
  */
 
+#include <stddef.h> /* for size_t */
+
+/* TODO(nsf): Use this overridable allocator interface and add tests for
+ * malloc/free correctness.
+ *
+ * A good idea: allocator interface should be stored in a thread-local
+ * variable.
+ */
+struct str_alloc_interface {
+	void *(*malloc)(size_t);
+	void (*free)(void*);
+};
+
 /* should be > 0, and remember, that real memory size is +1 (trailing \0 byte) */
 #ifndef STR_DEFAULT_CAPACITY
 #define STR_DEFAULT_CAPACITY 7
@@ -50,13 +63,16 @@ void str_ensure_cap(struct str **str, unsigned int n);
 /* appending to a str */
 void str_add_str(struct str **str, const struct str *str2);
 void str_add_cstr(struct str **str, const char *cstr);
+//void str_add_cstr_len(struct str **str, const char *cstr, unsigned int len);
 void str_add_printf(struct str **str, const char *fmt, ...);
+//void str_add_file(struct str **str, const char *filename);
 
 /* trim, removes 'isspace' characters from sides: both, left, right */
 void str_trim(struct str *str);
 void str_ltrim(struct str *str);
 void str_rtrim(struct str *str);
 
+// TODO(nsf): add func description
 struct str *str_path_split(const struct str *str, struct str **half2);
 
 /*
