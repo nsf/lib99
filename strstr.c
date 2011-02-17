@@ -117,7 +117,7 @@ struct str *str_from_file(const char *filename)
 		free(str);
 		return 0;
 	}
-
+	fclose(f);
 	return str;
 }
 
