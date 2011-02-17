@@ -72,8 +72,12 @@ void str_trim(struct str *str);
 void str_ltrim(struct str *str);
 void str_rtrim(struct str *str);
 
-// TODO(nsf): add func description
-struct str *str_path_split(const struct str *str, struct str **half2);
+/* Splits 'path' immediately following the final path separator, separating it
+ * into a directory and file name component. Returns a directory component if
+ * any (if none, returns zero). If 'half2' isn't zero, writes file name
+ * component to it (allocating a str, you're responsible to free it).
+ */
+struct str *str_path_split(const struct str *path, struct str **half2);
 
 /*
  * FStr is a fixed string.

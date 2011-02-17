@@ -263,7 +263,7 @@ struct str *str_path_split(const struct str *str, struct str **half2)
 	if (c == str->data) {
 		if (half2)
 			*half2 = str_dup(str);
-		return str_new(0);
+		return 0;
 	}
 
 	if (half2)

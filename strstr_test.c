@@ -274,7 +274,7 @@ START_TEST(test_str_path_split)
 
 	str = str_from_cstr("testpath");
 	half1 = str_path_split(str, &half2);
-	CHECK_STR(half1, == STR_DEFAULT_CAPACITY, == 0, "");
+	fail_unless(half1 == 0, "zero value expected");
 	CHECK_STR(half2, >= 8, == 8, "testpath");
 	str_free(str);
 	str_free(half1);
