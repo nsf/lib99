@@ -106,6 +106,7 @@ struct str *str_from_file(const char *filename)
 		return 0;
 	}
 	fclose(f);
+	str->data[st.st_size] = '\0';
 	return str;
 }
 
