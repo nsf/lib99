@@ -254,7 +254,7 @@ void str_rtrim(struct str *str)
 	str->data[str->len] = '\0';
 }
 
-struct str *str_path_split(const struct str *str, struct str **half2)
+struct str *str_split_path(const struct str *str, struct str **half2)
 {
 	const char *c = str->data + (str->len - 1);
 	while (c != str->data && *c != '/')

@@ -77,7 +77,7 @@ void str_rtrim(struct str *str);
  * any (if none, returns zero). If 'half2' isn't zero, writes file name
  * component to it (allocating a str, you're responsible to free it).
  */
-struct str *str_path_split(const struct str *path, struct str **half2);
+struct str *str_split_path(const struct str *path, struct str **half2);
 
 /*
  * FStr is a fixed string.

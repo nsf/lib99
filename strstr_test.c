@@ -253,11 +253,11 @@ START_TEST(test_str_trim)
 }
 END_TEST
 
-START_TEST(test_str_path_split)
+START_TEST(test_str_split_path)
 {
 	struct str *str = str_from_cstr("test/path");
 	struct str *half1, *half2;
-	half1 = str_path_split(str, &half2);
+	half1 = str_split_path(str, &half2);
 	CHECK_STR(half1, >= 4, == 4, "test");
 	CHECK_STR(half2, >= 4, == 4, "path");
 	str_free(str);
@@ -265,7 +265,7 @@ START_TEST(test_str_path_split)
 	str_free(half2);
 
 	str = str_from_cstr("test/my/path");
-	half1 = str_path_split(str, &half2);
+	half1 = str_split_path(str, &half2);
 	CHECK_STR(half1, >= 7, == 7, "test/my");
 	CHECK_STR(half2, >= 4, == 4, "path");
 	str_free(str);
@@ -273,7 +273,7 @@ START_TEST(test_str_path_split)
 	str_free(half2);
 
 	str = str_from_cstr("testpath");
-	half1 = str_path_split(str, &half2);
+	half1 = str_split_path(str, &half2);
 	fail_unless(half1 == 0, "zero value expected");
 	CHECK_STR(half2, >= 8, == 8, "testpath");
 	str_free(str);
@@ -376,7 +376,7 @@ Suite *strstr_suite()
 	tcase_add_test(tc_str, test_str_trim);
 	tcase_add_test(tc_str, test_str_ltrim);
 	tcase_add_test(tc_str, test_str_rtrim);
-	tcase_add_test(tc_str, test_str_path_split);
+	tcase_add_test(tc_str, test_str_split_path);
 
 	TCase *tc_fstr = tcase_create("fstr");
 	tcase_add_test(tc_fstr, test_fstr_init);
