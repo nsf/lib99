@@ -206,6 +206,30 @@ void str_add_printf(struct str **str, const char *fmt, ...)
 	s->len += len;
 }
 
+void str_add_file(struct str **str, const char *filename)
+{
+	assert(str != 0);
+	assert(filename != 0);
+	assert(*str != 0);
+
+	struct stat st;
+	FILE *f;
+
+	if (-1 == stat(filename, &st))
+		return;
+
+	f = fopen(filename, "r");
+	if (!f)
+		return;
+
+	str_ensure_cap(str, st.st_size);
+	struct str *s = *str;
+	if (st.st_size == fread(s->data + s->len, 1, st.st_size, f))
+		s->len += st.st_size;
+	fclose(f);
+	s->data[s->len] = '\0';
+}
+
 void str_trim(struct str *str)
 {
 	str_rtrim(str);

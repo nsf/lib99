@@ -121,6 +121,9 @@ START_TEST(test_str_from_file)
 	fail_unless(str != 0, "testdata/file.txt should be loaded successfully");
 	CHECK_STR(str, == 10, == 10, "123456789\n");
 	str_free(str);
+
+	str = str_from_file("non-existent file");
+	fail_unless(str == 0, "zero value expected");
 }
 END_TEST
 
@@ -185,6 +188,25 @@ START_TEST(test_str_add_printf)
 	str_add_printf(&str, "%d", 31337);
 	str_add_printf(&str, "%s", "31337");
 	CHECK_STR(str, >= 10, == 10, "3133731337");
+	str_free(str);
+}
+END_TEST
+
+START_TEST(test_str_add_file)
+{
+	struct str *str = str_from_cstr("abc");
+	str_add_file(&str, "testdata/file.txt");
+	CHECK_STR(str, >= 13, == 13, "abc123456789\n");
+	str_free(str);
+
+	str = str_new(0);
+	str_add_file(&str, "testdata/file.txt");
+	CHECK_STR(str, >= 10, == 10, "123456789\n");
+	str_free(str);
+
+	str = str_new(0);
+	str_add_file(&str, "non-existent file");
+	CHECK_STR(str, == STR_DEFAULT_CAPACITY, == 0, "");
 	str_free(str);
 }
 END_TEST
@@ -349,6 +371,7 @@ Suite *strstr_suite()
 	tcase_add_test(tc_str, test_str_add_str);
 	tcase_add_test(tc_str, test_str_add_cstr);
 	tcase_add_test(tc_str, test_str_add_printf);
+	tcase_add_test(tc_str, test_str_add_file);
 
 	tcase_add_test(tc_str, test_str_trim);
 	tcase_add_test(tc_str, test_str_ltrim);

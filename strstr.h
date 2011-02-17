@@ -65,7 +65,7 @@ void str_add_str(struct str **str, const struct str *str2);
 void str_add_cstr(struct str **str, const char *cstr);
 //void str_add_cstr_len(struct str **str, const char *cstr, unsigned int len);
 void str_add_printf(struct str **str, const char *fmt, ...);
-//void str_add_file(struct str **str, const char *filename);
+void str_add_file(struct str **str, const char *filename);
 
 /* trim, removes 'isspace' characters from sides: both, left, right */
 void str_trim(struct str *str);
