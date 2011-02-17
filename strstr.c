@@ -1,4 +1,5 @@
 #include "strstr.h"
+#include <sys/stat.h>
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
@@ -91,6 +92,33 @@ struct str *str_dup(const struct str *rhs)
 {
 	assert(rhs != 0);
 	return str_from_cstr_len(rhs->data, rhs->len);
+}
+
+struct str *str_from_file(const char *filename)
+{
+	assert(filename != 0);
+
+	struct stat st;
+	FILE *f;
+	struct str *str;
+
+	if (-1 == stat(filename, &st))
+		return 0;
+
+	f = fopen(filename, "r");
+	if (!f)
+		return 0;
+
+
+	str = xalloc(sizeof(struct str) + st.st_size + 1);
+	str->cap = str->len = st.st_size;
+	if (st.st_size != fread(str->data, 1, st.st_size, f)) {
+		fclose(f);
+		free(str);
+		return 0;
+	}
+
+	return str;
 }
 
 void str_ensure_cap(struct str **out_str, unsigned int n)

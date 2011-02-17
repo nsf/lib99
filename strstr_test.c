@@ -13,7 +13,7 @@ do {										\
 		    #_len " length expected, got: %d", (str)->len);		\
 	fail_unless(strcmp((str)->data, _data) == 0,				\
 		    "\"" _data "\" string data expected, got: \"%s\"",		\
-		    (str)->data);							\
+		    (str)->data);						\
 } while (0)
 
 START_TEST(test_str_new)
@@ -112,6 +112,15 @@ START_TEST(test_str_dup)
 	CHECK_STR(str2, == 8, == 8, "hello123");
 	str_free(str1);
 	str_free(str2);
+}
+END_TEST
+
+START_TEST(test_str_from_file)
+{
+	struct str *str = str_from_file("testdata/file.txt");
+	fail_unless(str != 0, "testdata/file.txt should be loaded successfully");
+	CHECK_STR(str, == 10, == 10, "123456789\n");
+	str_free(str);
 }
 END_TEST
 
@@ -335,9 +344,12 @@ Suite *strstr_suite()
 	tcase_add_test(tc_str, test_str_ensure_cap);
 	tcase_add_test(tc_str, test_str_printf);
 	tcase_add_test(tc_str, test_str_dup);
+	tcase_add_test(tc_str, test_str_from_file);
+
 	tcase_add_test(tc_str, test_str_add_str);
 	tcase_add_test(tc_str, test_str_add_cstr);
 	tcase_add_test(tc_str, test_str_add_printf);
+
 	tcase_add_test(tc_str, test_str_trim);
 	tcase_add_test(tc_str, test_str_ltrim);
 	tcase_add_test(tc_str, test_str_rtrim);

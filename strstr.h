@@ -39,6 +39,7 @@ struct str *str_from_cstr(const char *cstr);
 struct str *str_from_cstr_len(const char *cstr, unsigned int len);
 struct str *str_printf(const char *fmt, ...);
 struct str *str_dup(const struct str *str);
+struct str *str_from_file(const char *filename);
 
 void str_free(struct str *str);
 void str_clear(struct str *str);
