@@ -487,19 +487,13 @@ void quat_slerp(quat_t out, const quat_t q1, const quat_t q2, float t)
 
 void quat_from_angle(quat_t out, const vec3_t dir, float angle)
 {
-	out[0] = out[1] = out[2] = 0.0f;
-	out[3] = 1.0f;
-
-	float length = vec3_length(dir);
-	if (length != 0.0f) {
-		float halfangle = angle * MATH_DEG_TO_RAD / 2.0f;
-		length = 1.0f / length;
-		float sinangle = sinf(halfangle);
-		out[0] = dir[0] * length * sinangle;
-		out[1] = dir[1] * length * sinangle;
-		out[2] = dir[2] * length * sinangle;
-		out[3] = cosf(halfangle);
-	}
+	const float ilength = 1.0f / vec3_length(dir);
+	const float halfangle = angle * MATH_DEG_TO_RAD / 2.0f;
+	const float sinangle = sinf(halfangle);
+	out[0] = dir[0] * ilength * sinangle;
+	out[1] = dir[1] * ilength * sinangle;
+	out[2] = dir[2] * ilength * sinangle;
+	out[3] = cosf(halfangle);
 }
 
 /**************************************************************************
