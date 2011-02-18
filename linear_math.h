@@ -646,6 +646,13 @@ static inline void vec3_advance(vec3_t out, const vec3_t origin, const vec3_t di
 	VEC_Z(out) = VEC_Z(origin) + VEC_Z(dir) * distance;
 }
 
+static inline void vec3_advancea(vec3_t out, const vec3_t dir, float distance)
+{
+	VEC_X(out) += VEC_X(dir) * distance;
+	VEC_Y(out) += VEC_Y(dir) * distance;
+	VEC_Z(out) += VEC_Z(dir) * distance;
+}
+
 static inline bool vec3_equals(const vec3_t v1, const vec3_t v2)
 {
 	return (VEC_X(v1) == VEC_X(v2) && VEC_Y(v1) == VEC_Y(v2) && VEC_Z(v1) == VEC_Z(v2));

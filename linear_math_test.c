@@ -562,6 +562,20 @@ START_TEST(test_vec3_advance)
 }
 END_TEST
 
+START_TEST(test_vec3_advancea)
+{
+	vec3_t a = {4.5f, 0.0f, 7.1f};
+	vec3_advancea(a, VEC3_UNIT_Y, 3.0f);
+	CHECK_VEC3(a, 4.5f, 3.0f, 7.1f);
+
+	vec3_advancea(a, VEC3_UNIT_X, -2.0f);
+	CHECK_VEC3(a, 2.5f, 3.0f, 7.1f);
+
+	vec3_advancea(a, (vec3_t){0.0f, 1.0f, 1.0f}, 2.0f);
+	CHECK_VEC3(a, 2.5f, 5.0f, 9.1f);
+}
+END_TEST
+
 START_TEST(test_vec3_equals)
 {
 	vec3_t b, a = {1.4f, -3.1415f, 5.16f};
@@ -1192,6 +1206,7 @@ Suite *linear_math_suite()
 	tcase_add_test(tc_vec3, test_vec3_dot);
 	tcase_add_test(tc_vec3, test_vec3_cross);
 	tcase_add_test(tc_vec3, test_vec3_advance);
+	tcase_add_test(tc_vec3, test_vec3_advancea);
 	tcase_add_test(tc_vec3, test_vec3_equals);
 	tcase_add_test(tc_vec3, test_vec3_nearly_equals);
 	tcase_add_test(tc_vec3, test_vec3_rotate);
