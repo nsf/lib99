@@ -18,10 +18,10 @@ do {										\
 
 START_TEST(test_str_new)
 {
-	fail_unless(sizeof(struct str) == 8,
+	fail_unless(sizeof(str_t) == 8,
 		    "struct size is not correct for this compiler/architecture");
 
-	struct str *str = str_new(10);
+	str_t *str = str_new(10);
 	CHECK_STR(str, == 10, == 0, "");
 	str_free(str);
 
@@ -34,7 +34,7 @@ END_TEST
 
 START_TEST(test_str_clear)
 {
-	struct str *str = str_from_cstr("nsf");
+	str_t *str = str_from_cstr("nsf");
 	str_clear(str);
 	CHECK_STR(str, >= 3, == 0, "");
 	str_free(str);
@@ -44,7 +44,7 @@ END_TEST
 START_TEST(test_str_from_cstr)
 {
 	// simple string
-	struct str *str = str_from_cstr("Hello, nsf");
+	str_t *str = str_from_cstr("Hello, nsf");
 	CHECK_STR(str,
 		  == strlen("Hello, nsf"),
 		  == strlen("Hello, nsf"),
@@ -62,7 +62,7 @@ START_TEST(test_str_from_cstr_len)
 {
 	const char *cstr = "12345";
 
-	struct str *str = str_from_cstr_len(cstr, 5);
+	str_t *str = str_from_cstr_len(cstr, 5);
 	CHECK_STR(str, == 5, == 5, "12345");
 	str_free(str);
 
@@ -75,7 +75,7 @@ END_TEST
 START_TEST(test_str_ensure_cap)
 {
 	// zero capacity
-	struct str *str = str_new(0);
+	str_t *str = str_new(0);
 	str_ensure_cap(&str, 10);
 	CHECK_STR(str, >= 10, == 0, "");
 	str_free(str);
@@ -99,7 +99,7 @@ START_TEST(test_str_printf)
 {
 	// here I'm not checking all the printf stuff, because I use snprintf,
 	// all that needs to be checked is correct cap/len calculation.
-	struct str *str = str_printf("preved: %d", 31337);
+	str_t *str = str_printf("preved: %d", 31337);
 	CHECK_STR(str, == 13, == 13, "preved: 31337");
 	str_free(str);
 }
@@ -107,8 +107,8 @@ END_TEST
 
 START_TEST(test_str_dup)
 {
-	struct str *str1 = str_from_cstr("hello123");
-	struct str *str2 = str_dup(str1);
+	str_t *str1 = str_from_cstr("hello123");
+	str_t *str2 = str_dup(str1);
 	CHECK_STR(str2, == 8, == 8, "hello123");
 	str_free(str1);
 	str_free(str2);
@@ -117,7 +117,7 @@ END_TEST
 
 START_TEST(test_str_from_file)
 {
-	struct str *str = str_from_file("testdata/file.txt");
+	str_t *str = str_from_file("testdata/file.txt");
 	fail_unless(str != 0, "testdata/file.txt should be loaded successfully");
 	CHECK_STR(str, == 10, == 10, "123456789\n");
 	str_free(str);
@@ -129,8 +129,8 @@ END_TEST
 
 START_TEST(test_str_add_str)
 {
-	struct str *str1 = str_from_cstr("123");
-	struct str *str2 = str_from_cstr("456");
+	str_t *str1 = str_from_cstr("123");
+	str_t *str2 = str_from_cstr("456");
 	str_add_str(&str1, str2);
 	CHECK_STR(str1, >= 6, == 6, "123456");
 	str_free(str1);
@@ -158,7 +158,7 @@ END_TEST
 
 START_TEST(test_str_add_cstr)
 {
-	struct str *str = str_from_cstr("123");
+	str_t *str = str_from_cstr("123");
 	str_add_cstr(&str, "456");
 	CHECK_STR(str, >= 6, == 6, "123456");
 	str_free(str);
@@ -179,7 +179,7 @@ END_TEST
 
 START_TEST(test_str_add_cstr_len)
 {
-	struct str *str = str_from_cstr("123");
+	str_t *str = str_from_cstr("123");
 	str_add_cstr_len(&str, "456", 3);
 	CHECK_STR(str, >= 6, == 6, "123456");
 	str_free(str);
@@ -199,7 +199,7 @@ END_TEST
 
 START_TEST(test_str_add_printf)
 {
-	struct str *str = str_from_cstr("123");
+	str_t *str = str_from_cstr("123");
 	str_add_printf(&str, "%d", 456);
 	CHECK_STR(str, >= 6, == 6, "123456");
 	str_free(str);
@@ -214,7 +214,7 @@ END_TEST
 
 START_TEST(test_str_add_file)
 {
-	struct str *str = str_from_cstr("abc");
+	str_t *str = str_from_cstr("abc");
 	str_add_file(&str, "testdata/file.txt");
 	CHECK_STR(str, >= 13, == 13, "abc123456789\n");
 	str_free(str);
@@ -233,7 +233,7 @@ END_TEST
 
 START_TEST(test_str_rtrim)
 {
-	struct str *str = str_from_cstr("123\r\n  ");
+	str_t *str = str_from_cstr("123\r\n  ");
 	str_rtrim(str);
 	CHECK_STR(str, >= 3, == 3, "123");
 	str_free(str);
@@ -247,7 +247,7 @@ END_TEST
 
 START_TEST(test_str_ltrim)
 {
-	struct str *str = str_from_cstr(" 	\n\r123");
+	str_t *str = str_from_cstr(" 	\n\r123");
 	str_ltrim(str);
 	CHECK_STR(str, >= 3, == 3, "123");
 	str_free(str);
@@ -261,7 +261,7 @@ END_TEST
 
 START_TEST(test_str_trim)
 {
-	struct str *str = str_from_cstr(" 	\n\r123  \n");
+	str_t *str = str_from_cstr(" 	\n\r123  \n");
 	str_trim(str);
 	CHECK_STR(str, >= 3, == 3, "123");
 	str_free(str);
@@ -275,8 +275,8 @@ END_TEST
 
 START_TEST(test_str_split_path)
 {
-	struct str *str = str_from_cstr("test/path");
-	struct str *half1, *half2;
+	str_t *str = str_from_cstr("test/path");
+	str_t *half1, *half2;
 	half1 = str_split_path(str, &half2);
 	CHECK_STR(half1, >= 4, == 4, "test");
 	CHECK_STR(half2, >= 4, == 4, "path");
@@ -309,7 +309,7 @@ END_TEST
 START_TEST(test_fstr_init)
 {
 	char buf[40];
-	struct fstr fstr;
+	fstr_t fstr;
 
 	FSTR_INIT_FOR_BUF(&fstr, buf);
 	CHECK_STR(&fstr, == 39, == 0, "");
@@ -322,10 +322,10 @@ END_TEST
 START_TEST(test_fstr_add_str)
 {
 	char buf[11];
-	struct fstr fstr;
+	fstr_t fstr;
 
 	FSTR_INIT_FOR_BUF(&fstr, buf);
-	struct str *str = str_from_cstr("hello");
+	str_t *str = str_from_cstr("hello");
 
 	fstr_add_str(&fstr, str);
 	CHECK_STR(&fstr, == 10, == 5, "hello");
@@ -347,7 +347,7 @@ END_TEST
 START_TEST(test_fstr_add_cstr)
 {
 	char buf[11];
-	struct fstr fstr;
+	fstr_t fstr;
 
 	FSTR_INIT_FOR_BUF(&fstr, buf);
 
@@ -359,7 +359,7 @@ END_TEST
 START_TEST(test_fstr_add_printf)
 {
 	char buf[11];
-	struct fstr fstr;
+	fstr_t fstr;
 
 	FSTR_INIT_FOR_BUF(&fstr, buf);
 

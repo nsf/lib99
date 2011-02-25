@@ -27,7 +27,7 @@ static void *xalloc(size_t size)
 // STR
 //-------------------------------------------------------------------------------
 
-static int is_cstr_in_str(struct str *str, const char *cstr)
+static int is_cstr_in_str(str_t *str, const char *cstr)
 {
 	if ((str->data <= cstr) && (str->data + str->cap >= cstr))
 		return 1;
@@ -36,38 +36,38 @@ static int is_cstr_in_str(struct str *str, const char *cstr)
 
 //------------------------------------------------------------------------------
 
-struct str *str_new(unsigned int cap)
+str_t *str_new(unsigned int cap)
 {
 	if (!cap)
 		cap = STR_DEFAULT_CAPACITY;
-	struct str *str = xalloc(sizeof(struct str) + cap + 1);
+	str_t *str = xalloc(sizeof(str_t) + cap + 1);
 	str->len = 0;
 	str->cap = cap;
 	str->data[0] = '\0';
 	return str;
 }
 
-void str_free(struct str *str)
+void str_free(str_t *str)
 {
 	free(str);
 }
 
-void str_clear(struct str *str)
+void str_clear(str_t *str)
 {
 	str->len = 0;
 	str->data[0] = '\0';
 }
 
-struct str *str_from_cstr(const char *cstr)
+str_t *str_from_cstr(const char *cstr)
 {
 	assert(cstr != 0);
 	return str_from_cstr_len(cstr, strlen(cstr));
 }
 
-struct str *str_from_cstr_len(const char *cstr, unsigned int len)
+str_t *str_from_cstr_len(const char *cstr, unsigned int len)
 {
 	unsigned int cap = len > 0 ? len : STR_DEFAULT_CAPACITY;
-	struct str *str = xalloc(sizeof(struct str) + cap + 1);
+	str_t *str = xalloc(sizeof(str_t) + cap + 1);
 	str->len = len;
 	str->cap = cap;
 	if (len > 0)
@@ -76,19 +76,19 @@ struct str *str_from_cstr_len(const char *cstr, unsigned int len)
 	return str;
 }
 
-struct str *str_dup(const struct str *rhs)
+str_t *str_dup(const str_t *rhs)
 {
 	assert(rhs != 0);
 	return str_from_cstr_len(rhs->data, rhs->len);
 }
 
-struct str *str_from_file(const char *filename)
+str_t *str_from_file(const char *filename)
 {
 	assert(filename != 0);
 
 	struct stat st;
 	FILE *f;
-	struct str *str;
+	str_t *str;
 
 	if (-1 == stat(filename, &st))
 		return 0;
@@ -98,7 +98,7 @@ struct str *str_from_file(const char *filename)
 		return 0;
 
 
-	str = xalloc(sizeof(struct str) + st.st_size + 1);
+	str = xalloc(sizeof(str_t) + st.st_size + 1);
 	str->cap = str->len = st.st_size;
 	if (st.st_size != fread(str->data, 1, st.st_size, f)) {
 		fclose(f);
@@ -110,18 +110,18 @@ struct str *str_from_file(const char *filename)
 	return str;
 }
 
-void str_ensure_cap(struct str **out_str, unsigned int n)
+void str_ensure_cap(str_t **out_str, unsigned int n)
 {
 	assert(out_str != 0);
 	assert(*out_str != 0);
 
-	struct str *str = *out_str;
+	str_t *str = *out_str;
 	if (str->cap - str->len < n) {
 		unsigned int newcap = str->cap * 2;
 		if (newcap - str->len < n)
 			newcap = str->len + n;
 
-		struct str *newstr = xalloc(sizeof(struct str) +
+		str_t *newstr = xalloc(sizeof(str_t) +
 					    newcap + 1);
 		newstr->cap = newcap;
 		newstr->len = str->len;
@@ -134,7 +134,7 @@ void str_ensure_cap(struct str **out_str, unsigned int n)
 	}
 }
 
-struct str *str_printf(const char *fmt, ...)
+str_t *str_printf(const char *fmt, ...)
 {
 	assert(fmt != 0);
 
@@ -144,7 +144,7 @@ struct str *str_printf(const char *fmt, ...)
 	unsigned int len = vsnprintf(0, 0, fmt, va);
 	va_end(va);
 
-	struct str *str = xalloc(sizeof(struct str) +
+	str_t *str = xalloc(sizeof(str_t) +
 				 len + 1);
 	str->len = str->cap = len;
 	va_start(va, fmt);
@@ -153,7 +153,7 @@ struct str *str_printf(const char *fmt, ...)
 	return str;
 }
 
-void str_add_str(struct str **str, const struct str *str2)
+void str_add_str(str_t **str, const str_t *str2)
 {
 	assert(str != 0);
 	assert(str2 != 0);
@@ -163,7 +163,7 @@ void str_add_str(struct str **str, const struct str *str2)
 	str_add_cstr_len(str, str2->data, str2->len);
 }
 
-void str_add_cstr(struct str **str, const char *cstr)
+void str_add_cstr(str_t **str, const char *cstr)
 {
 	assert(str != 0);
 	assert(cstr != 0);
@@ -173,19 +173,19 @@ void str_add_cstr(struct str **str, const char *cstr)
 	str_add_cstr_len(str, cstr, strlen(cstr));
 }
 
-void str_add_cstr_len(struct str **str, const char *data, unsigned int len)
+void str_add_cstr_len(str_t **str, const char *data, unsigned int len)
 {
 	if (!len)
 		return;
 
 	str_ensure_cap(str, len);
 
-	struct str *s = *str;
+	str_t *s = *str;
 	memcpy(&s->data[s->len], data, len + 1);
 	s->len += len;
 }
 
-void str_add_printf(struct str **str, const char *fmt, ...)
+void str_add_printf(str_t **str, const char *fmt, ...)
 {
 	assert(str != 0);
 	assert(fmt != 0);
@@ -200,14 +200,14 @@ void str_add_printf(struct str **str, const char *fmt, ...)
 
 	str_ensure_cap(str, len);
 
-	struct str *s = *str;
+	str_t *s = *str;
 	va_start(va, fmt);
 	vsnprintf(&s->data[s->len], len + 1, fmt, va);
 	va_end(va);
 	s->len += len;
 }
 
-void str_add_file(struct str **str, const char *filename)
+void str_add_file(str_t **str, const char *filename)
 {
 	assert(str != 0);
 	assert(filename != 0);
@@ -224,20 +224,20 @@ void str_add_file(struct str **str, const char *filename)
 		return;
 
 	str_ensure_cap(str, st.st_size);
-	struct str *s = *str;
+	str_t *s = *str;
 	if (st.st_size == fread(s->data + s->len, 1, st.st_size, f))
 		s->len += st.st_size;
 	fclose(f);
 	s->data[s->len] = '\0';
 }
 
-void str_trim(struct str *str)
+void str_trim(str_t *str)
 {
 	str_rtrim(str);
 	str_ltrim(str);
 }
 
-void str_ltrim(struct str *str)
+void str_ltrim(str_t *str)
 {
 	char *c = str->data;
 	while (str->len > 0 && isspace(*c)) {
@@ -248,14 +248,14 @@ void str_ltrim(struct str *str)
 	str->data[str->len] = '\0';
 }
 
-void str_rtrim(struct str *str)
+void str_rtrim(str_t *str)
 {
 	while (str->len > 0 && isspace(str->data[str->len - 1]))
 		str->len--;
 	str->data[str->len] = '\0';
 }
 
-struct str *str_split_path(const struct str *str, struct str **half2)
+str_t *str_split_path(const str_t *str, str_t **half2)
 {
 	const char *c = str->data + (str->len - 1);
 	while (c != str->data && *c != '/')
@@ -277,7 +277,7 @@ struct str *str_split_path(const struct str *str, struct str **half2)
 // FSTR
 //-------------------------------------------------------------------------------
 
-void fstr_add_cstr_len(struct fstr *fstr, const char *data, unsigned int len)
+void fstr_add_cstr_len(fstr_t *fstr, const char *data, unsigned int len)
 {
 	if (!len)
 		return;
@@ -293,7 +293,7 @@ void fstr_add_cstr_len(struct fstr *fstr, const char *data, unsigned int len)
 
 //------------------------------------------------------------------------------
 
-void fstr_init(struct fstr *fstr, char *data, unsigned int len, unsigned int cap)
+void fstr_init(fstr_t *fstr, char *data, unsigned int len, unsigned int cap)
 {
 	assert(fstr != 0);
 	assert(data != 0);
@@ -306,7 +306,7 @@ void fstr_init(struct fstr *fstr, char *data, unsigned int len, unsigned int cap
 	fstr->data[0] = '\0';
 }
 
-void fstr_add_str(struct fstr *fstr, const struct str *str)
+void fstr_add_str(fstr_t *fstr, const str_t *str)
 {
 	assert(fstr != 0);
 	assert(str != 0);
@@ -314,7 +314,7 @@ void fstr_add_str(struct fstr *fstr, const struct str *str)
 	fstr_add_cstr_len(fstr, str->data, str->len);
 }
 
-void fstr_add_cstr(struct fstr *fstr, const char *cstr)
+void fstr_add_cstr(fstr_t *fstr, const char *cstr)
 {
 	assert(fstr != 0);
 	assert(cstr != 0);
@@ -322,7 +322,7 @@ void fstr_add_cstr(struct fstr *fstr, const char *cstr)
 	fstr_add_cstr_len(fstr, cstr, strlen(cstr));
 }
 
-void fstr_add_printf(struct fstr *fstr, const char *fmt, ...)
+void fstr_add_printf(fstr_t *fstr, const char *fmt, ...)
 {
 	assert(fstr != 0);
 	assert(fmt != 0);
