@@ -1,5 +1,43 @@
 #include "strstr.h"
 #include <check.h>
+#include <stdlib.h>
+
+//-------------------------------------------------------------------------------
+// Simplest possible debug alloc
+//-------------------------------------------------------------------------------
+
+static int allocations = 0;
+
+static void *debug_malloc(size_t size)
+{
+	void *p = malloc(size);
+	if (!p)
+		fail("malloc failed");
+	allocations++;
+	return p;
+}
+
+static void debug_free(void *p)
+{
+	allocations--;
+	free(p);
+}
+
+static void setup_debug_allocator()
+{
+	str_allocator_t alloc = {
+		debug_malloc,
+		debug_free
+	};
+	str_set_allocator(&alloc);
+}
+
+static void check_allocator_failure()
+{
+	if (allocations != 0)
+		fail("probably a memory leak, allocations: %d (should be 0)\n",
+		     allocations);
+}
 
 //-------------------------------------------------------------------------------
 // STR
@@ -297,7 +335,6 @@ START_TEST(test_str_split_path)
 	fail_unless(half1 == 0, "zero value expected");
 	CHECK_STR(half2, >= 8, == 8, "testpath");
 	str_free(str);
-	str_free(half1);
 	str_free(half2);
 }
 END_TEST
@@ -379,6 +416,9 @@ Suite *strstr_suite()
 	Suite *s = suite_create("strstr");
 
 	TCase *tc_str = tcase_create("str");
+	tcase_add_checked_fixture(tc_str,
+				  setup_debug_allocator,
+				  check_allocator_failure);
 	tcase_add_test(tc_str, test_str_new);
 	tcase_add_test(tc_str, test_str_clear);
 	tcase_add_test(tc_str, test_str_from_cstr);
@@ -400,6 +440,9 @@ Suite *strstr_suite()
 	tcase_add_test(tc_str, test_str_split_path);
 
 	TCase *tc_fstr = tcase_create("fstr");
+	tcase_add_checked_fixture(tc_fstr,
+				  setup_debug_allocator,
+				  check_allocator_failure);
 	tcase_add_test(tc_fstr, test_fstr_init);
 	tcase_add_test(tc_fstr, test_fstr_add_str);
 	tcase_add_test(tc_fstr, test_fstr_add_cstr);
