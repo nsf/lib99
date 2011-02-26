@@ -30,10 +30,10 @@
  * A good idea: allocator interface should be stored in a thread-local
  * variable.
  */
-struct str_alloc_interface {
+typedef struct str_alloc_interface {
 	void *(*malloc)(size_t);
 	void (*free)(void*);
-};
+} str_alloc_interface_t;
 
 /* should be > 0, and remember, that real memory size is +1 (trailing \0 byte) */
 #ifndef STR_DEFAULT_CAPACITY
