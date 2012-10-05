@@ -49,9 +49,9 @@ static int is_cstr_in_str(str_t *str, const char *cstr)
 
 //------------------------------------------------------------------------------
 
-str_t *str_new(unsigned int cap)
+str_t *str_new(int cap)
 {
-	if (!cap)
+	if (cap <= 0)
 		cap = STR_DEFAULT_CAPACITY;
 	str_t *str = (*allocator.malloc)(sizeof(str_t) + cap + 1);
 	str->len = 0;
@@ -77,9 +77,9 @@ str_t *str_from_cstr(const char *cstr)
 	return str_from_cstr_len(cstr, strlen(cstr));
 }
 
-str_t *str_from_cstr_len(const char *cstr, unsigned int len)
+str_t *str_from_cstr_len(const char *cstr, int len)
 {
-	unsigned int cap = len > 0 ? len : STR_DEFAULT_CAPACITY;
+	int cap = len > 0 ? len : STR_DEFAULT_CAPACITY;
 	str_t *str = (*allocator.malloc)(sizeof(str_t) + cap + 1);
 	str->len = len;
 	str->cap = cap;
@@ -123,14 +123,14 @@ str_t *str_from_file(const char *filename)
 	return str;
 }
 
-void str_ensure_cap(str_t **out_str, unsigned int n)
+void str_ensure_cap(str_t **out_str, int n)
 {
 	assert(out_str != 0);
 	assert(*out_str != 0);
 
 	str_t *str = *out_str;
 	if (str->cap - str->len < n) {
-		unsigned int newcap = str->cap * 2;
+		int newcap = str->cap * 2;
 		if (newcap - str->len < n)
 			newcap = str->len + n;
 
@@ -153,7 +153,7 @@ str_t *str_printf(const char *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	unsigned int len = vsnprintf(0, 0, fmt, va);
+	int len = vsnprintf(0, 0, fmt, va);
 	va_end(va);
 
 	str_t *str = (*allocator.malloc)(sizeof(str_t) + len + 1);
@@ -184,9 +184,9 @@ void str_add_cstr(str_t **str, const char *cstr)
 	str_add_cstr_len(str, cstr, strlen(cstr));
 }
 
-void str_add_cstr_len(str_t **str, const char *data, unsigned int len)
+void str_add_cstr_len(str_t **str, const char *data, int len)
 {
-	if (!len)
+	if (len <= 0)
 		return;
 
 	str_ensure_cap(str, len);
@@ -206,7 +206,7 @@ void str_add_printf(str_t **str, const char *fmt, ...)
 	va_list va;
 
 	va_start(va, fmt);
-	unsigned int len = vsnprintf(0, 0, fmt, va);
+	int len = vsnprintf(0, 0, fmt, va);
 	va_end(va);
 
 	str_ensure_cap(str, len);
@@ -288,12 +288,12 @@ str_t *str_split_path(const str_t *str, str_t **half2)
 // FSTR
 //-------------------------------------------------------------------------------
 
-void fstr_add_cstr_len(fstr_t *fstr, const char *data, unsigned int len)
+void fstr_add_cstr_len(fstr_t *fstr, const char *data, int len)
 {
 	if (!len)
 		return;
 
-	unsigned int avail = fstr->cap - fstr->len;
+	int avail = fstr->cap - fstr->len;
 	if (len > avail)
 		len = avail;
 
@@ -304,7 +304,7 @@ void fstr_add_cstr_len(fstr_t *fstr, const char *data, unsigned int len)
 
 //------------------------------------------------------------------------------
 
-void fstr_init(fstr_t *fstr, char *data, unsigned int len, unsigned int cap)
+void fstr_init(fstr_t *fstr, char *data, int len, int cap)
 {
 	assert(fstr != 0);
 	assert(data != 0);
@@ -339,15 +339,13 @@ void fstr_add_printf(fstr_t *fstr, const char *fmt, ...)
 	assert(fmt != 0);
 
 	va_list va;
-	unsigned int avail = fstr->cap - fstr->len;
+	int avail = fstr->cap - fstr->len;
 
 	va_start(va, fmt);
-	int plen = vsnprintf(&fstr->data[fstr->len], avail+1, fmt, va);
+	int len = vsnprintf(&fstr->data[fstr->len], avail+1, fmt, va);
 	va_end(va);
 
-	assert(plen >= 0);
-
-	unsigned int len = (unsigned int)plen;
+	assert(len >= 0);
 	if (len > avail)
 		len = avail;
 	fstr->len += len;

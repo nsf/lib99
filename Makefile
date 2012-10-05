@@ -6,7 +6,6 @@ FILES:=test_main.c test_suites.h\
 	linear_math.c linear_math.h linear_math_test.c
 
 SOURCES:=$(filter-out %.h,$(FILES))
-	
 
 test: test_main
 	@./test_main
