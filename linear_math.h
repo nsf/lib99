@@ -166,160 +166,50 @@ do {					\
   vec2: two-dimensional vector
 **************************************************************************/
 
-/************************************************************
- * Macro generated vector operation functions for vec2      *
- * (select in vim with visual mode and type !m4 to process) *
- ************************************************************
-define(`ASSIGNMENT_VEC2_FUNCTION',
-`static inline void vec2_$2(vec2_t out, const vec2_t v)
-{
-	VEC_X(out) $1 VEC_X(v);
-	VEC_Y(out) $1 VEC_Y(v);
+#define ASSIGNMENT_VEC2_FUNCTION(op, name)					\
+static inline void vec2_##name(vec2_t out, const vec2_t v)			\
+{										\
+	VEC_X(out) op VEC_X(v);							\
+	VEC_Y(out) op VEC_Y(v);							\
 }
-')dnl
-define(`GENERAL_VEC2_FUNCTION',
-`static inline void vec2_$2(vec2_t out, const vec2_t v1, const vec2_t v2)
-{
-	VEC_X(out) = VEC_X(v1) $1 VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) $1 VEC_Y(v2);
+
+#define ORDINARY_VEC2_FUNCTION(op, name)					\
+static inline void vec2_##name(vec2_t out, const vec2_t v1, const vec2_t v2)	\
+{										\
+	VEC_X(out) = VEC_X(v1) op VEC_X(v2);					\
+	VEC_Y(out) = VEC_Y(v1) op VEC_Y(v2);					\
 }
-')dnl
+
+#define SCALAR_ASSIGNMENT_VEC2_FUNCTION(op, name)				\
+static inline void vec2_##name(vec2_t out, float s)				\
+{										\
+	VEC_X(out) op s;							\
+	VEC_Y(out) op s;							\
+}
+
+#define SCALAR_ORDINARY_VEC2_FUNCTION(op, name)					\
+static inline void vec2_##name(vec2_t out, const vec2_t v1, float s)		\
+{										\
+	VEC_X(out) = VEC_X(v1) op s;						\
+	VEC_Y(out) = VEC_Y(v1) op s;						\
+}
+
 ASSIGNMENT_VEC2_FUNCTION(+=, adda)
 ASSIGNMENT_VEC2_FUNCTION(-=, suba)
 ASSIGNMENT_VEC2_FUNCTION(*=, mula)
 ASSIGNMENT_VEC2_FUNCTION(/=, diva)
-GENERAL_VEC2_FUNCTION(+, add)
-GENERAL_VEC2_FUNCTION(-, sub)
-GENERAL_VEC2_FUNCTION(*, mul)
-GENERAL_VEC2_FUNCTION(/, div)
-*/
-static inline void vec2_adda(vec2_t out, const vec2_t v)
-{
-	VEC_X(out) += VEC_X(v);
-	VEC_Y(out) += VEC_Y(v);
-}
-
-static inline void vec2_suba(vec2_t out, const vec2_t v)
-{
-	VEC_X(out) -= VEC_X(v);
-	VEC_Y(out) -= VEC_Y(v);
-}
-
-static inline void vec2_mula(vec2_t out, const vec2_t v)
-{
-	VEC_X(out) *= VEC_X(v);
-	VEC_Y(out) *= VEC_Y(v);
-}
-
-static inline void vec2_diva(vec2_t out, const vec2_t v)
-{
-	VEC_X(out) /= VEC_X(v);
-	VEC_Y(out) /= VEC_Y(v);
-}
-
-static inline void vec2_add(vec2_t out, const vec2_t v1, const vec2_t v2)
-{
-	VEC_X(out) = VEC_X(v1) + VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) + VEC_Y(v2);
-}
-
-static inline void vec2_sub(vec2_t out, const vec2_t v1, const vec2_t v2)
-{
-	VEC_X(out) = VEC_X(v1) - VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) - VEC_Y(v2);
-}
-
-static inline void vec2_mul(vec2_t out, const vec2_t v1, const vec2_t v2)
-{
-	VEC_X(out) = VEC_X(v1) * VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) * VEC_Y(v2);
-}
-
-static inline void vec2_div(vec2_t out, const vec2_t v1, const vec2_t v2)
-{
-	VEC_X(out) = VEC_X(v1) / VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) / VEC_Y(v2);
-}
-/* END
- ************************************************************************/
-
-/************************************************************
- * Macro generated scalar operation functions for vec2      *
- * (select in vim with visual mode and type !m4 to process) *
- ************************************************************
-define(`SCALAR_ASSIGNMENT_VEC2_FUNCTION',
-`static inline void vec2_$2(vec2_t out, float s)
-{
-	VEC_X(out) $1 s;
-	VEC_Y(out) $1 s;
-}
-')dnl
-define(`SCALAR_GENERAL_VEC2_FUNCTION',
-`static inline void vec2_$2(vec2_t out, const vec2_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) $1 s;
-	VEC_Y(out) = VEC_Y(v1) $1 s;
-}
-')dnl
+ORDINARY_VEC2_FUNCTION(+, add)
+ORDINARY_VEC2_FUNCTION(-, sub)
+ORDINARY_VEC2_FUNCTION(*, mul)
+ORDINARY_VEC2_FUNCTION(/, div)
 SCALAR_ASSIGNMENT_VEC2_FUNCTION(+=, sadda)
 SCALAR_ASSIGNMENT_VEC2_FUNCTION(-=, ssuba)
 SCALAR_ASSIGNMENT_VEC2_FUNCTION(*=, smula)
 SCALAR_ASSIGNMENT_VEC2_FUNCTION(/=, sdiva)
-SCALAR_GENERAL_VEC2_FUNCTION(+, sadd)
-SCALAR_GENERAL_VEC2_FUNCTION(-, ssub)
-SCALAR_GENERAL_VEC2_FUNCTION(*, smul)
-SCALAR_GENERAL_VEC2_FUNCTION(/, sdiv)
-*/
-static inline void vec2_sadda(vec2_t out, float s)
-{
-	VEC_X(out) += s;
-	VEC_Y(out) += s;
-}
-
-static inline void vec2_ssuba(vec2_t out, float s)
-{
-	VEC_X(out) -= s;
-	VEC_Y(out) -= s;
-}
-
-static inline void vec2_smula(vec2_t out, float s)
-{
-	VEC_X(out) *= s;
-	VEC_Y(out) *= s;
-}
-
-static inline void vec2_sdiva(vec2_t out, float s)
-{
-	VEC_X(out) /= s;
-	VEC_Y(out) /= s;
-}
-
-static inline void vec2_sadd(vec2_t out, const vec2_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) + s;
-	VEC_Y(out) = VEC_Y(v1) + s;
-}
-
-static inline void vec2_ssub(vec2_t out, const vec2_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) - s;
-	VEC_Y(out) = VEC_Y(v1) - s;
-}
-
-static inline void vec2_smul(vec2_t out, const vec2_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) * s;
-	VEC_Y(out) = VEC_Y(v1) * s;
-}
-
-static inline void vec2_sdiv(vec2_t out, const vec2_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) / s;
-	VEC_Y(out) = VEC_Y(v1) / s;
-}
-
-/* END
- ************************************************************************/
+SCALAR_ORDINARY_VEC2_FUNCTION(+, sadd)
+SCALAR_ORDINARY_VEC2_FUNCTION(-, ssub)
+SCALAR_ORDINARY_VEC2_FUNCTION(*, smul)
+SCALAR_ORDINARY_VEC2_FUNCTION(/, sdiv)
 
 /* utility functions for vec2 */
 static inline void vec2_set(vec2_t out, float x, float y)
@@ -393,181 +283,54 @@ void vec2_rotate(vec2_t out, float deg, const vec2_t origin);
   vec3: three-dimensional vector
 **************************************************************************/
 
-/************************************************************
- * Macro generated vector operation functions for vec3      *
- * (select in vim with visual mode and type !m4 to process) *
- ************************************************************
-define(`ASSIGNMENT_VEC3_FUNCTION',
-`static inline void vec3_$2(vec3_t out, const vec3_t v)
-{
-	VEC_X(out) $1 VEC_X(v);
-	VEC_Y(out) $1 VEC_Y(v);
-	VEC_Z(out) $1 VEC_Z(v);
+#define ASSIGNMENT_VEC3_FUNCTION(op, name)					\
+static inline void vec3_##name(vec3_t out, const vec3_t v)			\
+{										\
+	VEC_X(out) op VEC_X(v);							\
+	VEC_Y(out) op VEC_Y(v);							\
+	VEC_Z(out) op VEC_Z(v);							\
 }
-')dnl
-define(`GENERAL_VEC3_FUNCTION',
-`static inline void vec3_$2(vec3_t out, const vec3_t v1, const vec3_t v2)
-{
-	VEC_X(out) = VEC_X(v1) $1 VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) $1 VEC_Y(v2);
-	VEC_Z(out) = VEC_Z(v1) $1 VEC_Z(v2);
+
+#define ORDINARY_VEC3_FUNCTION(op, name)					\
+static inline void vec3_##name(vec3_t out, const vec3_t v1, const vec3_t v2)	\
+{										\
+	VEC_X(out) = VEC_X(v1) op VEC_X(v2);					\
+	VEC_Y(out) = VEC_Y(v1) op VEC_Y(v2);					\
+	VEC_Z(out) = VEC_Z(v1) op VEC_Z(v2);					\
 }
-')dnl
+
+#define SCALAR_ASSIGNMENT_VEC3_FUNCTION(op, name)				\
+static inline void vec3_##name(vec3_t out, float s)				\
+{										\
+	VEC_X(out) op s;							\
+	VEC_Y(out) op s;							\
+	VEC_Z(out) op s;							\
+}
+
+#define SCALAR_ORDINARY_VEC3_FUNCTION(op, name)					\
+static inline void vec3_##name(vec3_t out, const vec3_t v1, float s)		\
+{										\
+	VEC_X(out) = VEC_X(v1) op s;						\
+	VEC_Y(out) = VEC_Y(v1) op s;						\
+	VEC_Z(out) = VEC_Z(v1) op s;						\
+}
+
 ASSIGNMENT_VEC3_FUNCTION(+=, adda)
 ASSIGNMENT_VEC3_FUNCTION(-=, suba)
 ASSIGNMENT_VEC3_FUNCTION(*=, mula)
 ASSIGNMENT_VEC3_FUNCTION(/=, diva)
-GENERAL_VEC3_FUNCTION(+, add)
-GENERAL_VEC3_FUNCTION(-, sub)
-GENERAL_VEC3_FUNCTION(*, mul)
-GENERAL_VEC3_FUNCTION(/, div)
-*/
-static inline void vec3_adda(vec3_t out, const vec3_t v)
-{
-	VEC_X(out) += VEC_X(v);
-	VEC_Y(out) += VEC_Y(v);
-	VEC_Z(out) += VEC_Z(v);
-}
-
-static inline void vec3_suba(vec3_t out, const vec3_t v)
-{
-	VEC_X(out) -= VEC_X(v);
-	VEC_Y(out) -= VEC_Y(v);
-	VEC_Z(out) -= VEC_Z(v);
-}
-
-static inline void vec3_mula(vec3_t out, const vec3_t v)
-{
-	VEC_X(out) *= VEC_X(v);
-	VEC_Y(out) *= VEC_Y(v);
-	VEC_Z(out) *= VEC_Z(v);
-}
-
-static inline void vec3_diva(vec3_t out, const vec3_t v)
-{
-	VEC_X(out) /= VEC_X(v);
-	VEC_Y(out) /= VEC_Y(v);
-	VEC_Z(out) /= VEC_Z(v);
-}
-
-static inline void vec3_add(vec3_t out, const vec3_t v1, const vec3_t v2)
-{
-	VEC_X(out) = VEC_X(v1) + VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) + VEC_Y(v2);
-	VEC_Z(out) = VEC_Z(v1) + VEC_Z(v2);
-}
-
-static inline void vec3_sub(vec3_t out, const vec3_t v1, const vec3_t v2)
-{
-	VEC_X(out) = VEC_X(v1) - VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) - VEC_Y(v2);
-	VEC_Z(out) = VEC_Z(v1) - VEC_Z(v2);
-}
-
-static inline void vec3_mul(vec3_t out, const vec3_t v1, const vec3_t v2)
-{
-	VEC_X(out) = VEC_X(v1) * VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) * VEC_Y(v2);
-	VEC_Z(out) = VEC_Z(v1) * VEC_Z(v2);
-}
-
-static inline void vec3_div(vec3_t out, const vec3_t v1, const vec3_t v2)
-{
-	VEC_X(out) = VEC_X(v1) / VEC_X(v2);
-	VEC_Y(out) = VEC_Y(v1) / VEC_Y(v2);
-	VEC_Z(out) = VEC_Z(v1) / VEC_Z(v2);
-}
-
-/* END
- ************************************************************************/
-
-/************************************************************
- * Macro generated scalar operation functions for vec3      *
- * (select in vim with visual mode and type !m4 to process) *
- ************************************************************
-define(`SCALAR_ASSIGNMENT_VEC3_FUNCTION',
-`static inline void vec3_$2(vec3_t out, float s)
-{
-	VEC_X(out) $1 s;
-	VEC_Y(out) $1 s;
-	VEC_Z(out) $1 s;
-}
-')dnl
-define(`SCALAR_GENERAL_VEC3_FUNCTION',
-`static inline void vec3_$2(vec3_t out, const vec3_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) $1 s;
-	VEC_Y(out) = VEC_Y(v1) $1 s;
-	VEC_Z(out) = VEC_Z(v1) $1 s;
-}
-')dnl
+ORDINARY_VEC3_FUNCTION(+, add)
+ORDINARY_VEC3_FUNCTION(-, sub)
+ORDINARY_VEC3_FUNCTION(*, mul)
+ORDINARY_VEC3_FUNCTION(/, div)
 SCALAR_ASSIGNMENT_VEC3_FUNCTION(+=, sadda)
 SCALAR_ASSIGNMENT_VEC3_FUNCTION(-=, ssuba)
 SCALAR_ASSIGNMENT_VEC3_FUNCTION(*=, smula)
 SCALAR_ASSIGNMENT_VEC3_FUNCTION(/=, sdiva)
-SCALAR_GENERAL_VEC3_FUNCTION(+, sadd)
-SCALAR_GENERAL_VEC3_FUNCTION(-, ssub)
-SCALAR_GENERAL_VEC3_FUNCTION(*, smul)
-SCALAR_GENERAL_VEC3_FUNCTION(/, sdiv)
-*/
-static inline void vec3_sadda(vec3_t out, float s)
-{
-	VEC_X(out) += s;
-	VEC_Y(out) += s;
-	VEC_Z(out) += s;
-}
-
-static inline void vec3_ssuba(vec3_t out, float s)
-{
-	VEC_X(out) -= s;
-	VEC_Y(out) -= s;
-	VEC_Z(out) -= s;
-}
-
-static inline void vec3_smula(vec3_t out, float s)
-{
-	VEC_X(out) *= s;
-	VEC_Y(out) *= s;
-	VEC_Z(out) *= s;
-}
-
-static inline void vec3_sdiva(vec3_t out, float s)
-{
-	VEC_X(out) /= s;
-	VEC_Y(out) /= s;
-	VEC_Z(out) /= s;
-}
-
-static inline void vec3_sadd(vec3_t out, const vec3_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) + s;
-	VEC_Y(out) = VEC_Y(v1) + s;
-	VEC_Z(out) = VEC_Z(v1) + s;
-}
-
-static inline void vec3_ssub(vec3_t out, const vec3_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) - s;
-	VEC_Y(out) = VEC_Y(v1) - s;
-	VEC_Z(out) = VEC_Z(v1) - s;
-}
-
-static inline void vec3_smul(vec3_t out, const vec3_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) * s;
-	VEC_Y(out) = VEC_Y(v1) * s;
-	VEC_Z(out) = VEC_Z(v1) * s;
-}
-
-static inline void vec3_sdiv(vec3_t out, const vec3_t v1, float s)
-{
-	VEC_X(out) = VEC_X(v1) / s;
-	VEC_Y(out) = VEC_Y(v1) / s;
-	VEC_Z(out) = VEC_Z(v1) / s;
-}
-
-/* END
- ************************************************************************/
+SCALAR_ORDINARY_VEC3_FUNCTION(+, sadd)
+SCALAR_ORDINARY_VEC3_FUNCTION(-, ssub)
+SCALAR_ORDINARY_VEC3_FUNCTION(*, smul)
+SCALAR_ORDINARY_VEC3_FUNCTION(/, sdiv)
 
 /* utility functions for vec3 */
 static inline void vec3_set(vec3_t out, float x, float y, float z)
