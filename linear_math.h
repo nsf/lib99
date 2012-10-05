@@ -35,26 +35,26 @@ typedef float vec4_sse_t[4] __attribute__((aligned(16)));
 typedef float quat_sse_t[4] __attribute__((aligned(16)));
 typedef float mat4_sse_t[16] __attribute__((aligned(16)));
 
-enum plane_side {
+typedef enum {
 	PLANE_FRONT,
 	PLANE_BACK,
 	PLANE_BOTH
-};
+} plane_side_t;
 
-enum frustum_side {
+typedef enum {
 	FRUSTUM_INSIDE,
 	FRUSTUM_OUTSIDE,
 	FRUSTUM_BOTH
-};
+} frustum_side_t;
 
-enum frustum_plane {
+typedef enum {
 	FRUSTUM_PLANE_NEAR,
 	FRUSTUM_PLANE_FAR,
 	FRUSTUM_PLANE_LEFT,
 	FRUSTUM_PLANE_RIGHT,
 	FRUSTUM_PLANE_BOTTOM,
 	FRUSTUM_PLANE_TOP
-};
+} frustum_plane_t;
 
 /*
  * If I'm writing down a column-major matrix as a C array, it looks transposed
@@ -605,15 +605,15 @@ static inline void plane_from_points(plane_t out, const vec3_t v1, const vec3_t 
 	PLANE_D(out) = -vec3_dot(out, v1);
 }
 
-enum plane_side plane_side_point(const plane_t plane, const vec3_t point);
-enum plane_side plane_side_aabb(const plane_t plane, const aabb_t aabb);
+plane_side_t plane_side_point(const plane_t plane, const vec3_t point);
+plane_side_t plane_side_aabb(const plane_t plane, const aabb_t aabb);
 
 /**************************************************************************
   frustum
 **************************************************************************/
 
 void frustum_set(frustum_t out, const mat4_t matrix);
-enum frustum_side frustum_side_aabb(const frustum_t frustum, const aabb_t aabb);
+frustum_side_t frustum_side_aabb(const frustum_t frustum, const aabb_t aabb);
 
 /**************************************************************************
   intersections

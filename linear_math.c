@@ -527,14 +527,14 @@ void aabb_add_aabb(aabb_t aabb1, const aabb_t aabb2)
   plane: three-dimensional plane
 **************************************************************************/
 
-enum plane_side plane_side_point(const plane_t plane, const vec3_t point)
+plane_side_t plane_side_point(const plane_t plane, const vec3_t point)
 {
 	if (vec3_dot(plane, point) + PLANE_D(plane) >= 0.0f)
 		return PLANE_FRONT;
 	return PLANE_BACK;
 }
 
-enum plane_side plane_side_aabb(const plane_t plane, const aabb_t aabb)
+plane_side_t plane_side_aabb(const plane_t plane, const aabb_t aabb)
 {
 	vec3_t near, far;
 	vec3_copy(near, AABB_MAX(aabb));
@@ -611,12 +611,12 @@ void frustum_set(frustum_t out, const mat4_t m)
 	}
 }
 
-enum frustum_side frustum_side_aabb(const frustum_t frustum, const aabb_t aabb)
+frustum_side_t frustum_side_aabb(const frustum_t frustum, const aabb_t aabb)
 {
 	int i;
-	enum frustum_side result = FRUSTUM_OUTSIDE;
+	frustum_side_t result = FRUSTUM_OUTSIDE;
 	for (i = 0; i < 6; ++i) {
-		enum plane_side ps = plane_side_aabb(FRUSTUM_PLANE(frustum, i), aabb);
+		plane_side_t ps = plane_side_aabb(FRUSTUM_PLANE(frustum, i), aabb);
 		switch (ps) {
 		case PLANE_FRONT:
 			if (result != FRUSTUM_BOTH)
